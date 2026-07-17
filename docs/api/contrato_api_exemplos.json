@@ -1,0 +1,168 @@
+[
+  {
+    "perfil_origem": "Saudável",
+    "id_cliente_origem": 5,
+    "entrada": {
+      "renda_mensal": 3310.13,
+      "nivel_endividamento": 36.7,
+      "frequencia_poupanca": "Alta",
+      "transacoes": [
+        {
+          "descricao": "Transporte",
+          "valor": 51.0
+        },
+        {
+          "descricao": "Entretenimento",
+          "valor": 727.0
+        },
+        {
+          "descricao": "Transporte",
+          "valor": 80.0
+        },
+        {
+          "descricao": "Transporte",
+          "valor": 50.0
+        },
+        {
+          "descricao": "Transporte",
+          "valor": 74.0
+        }
+      ],
+      "idade": 34
+    },
+    "saida_analise": {
+      "perfil_financeiro": "Saudável",
+      "probabilidade": 0.98,
+      "resumo_gastos": {
+        "alimentacao": 982.0
+      },
+      "recomendacoes": [
+        "Priorizar redução do nível de endividamento"
+      ]
+    },
+    "exemplo_simulacao_nova_despesa": {
+      "perfil_atual": "Saudável",
+      "perfil_projetado": "Saudável",
+      "houve_piora": false,
+      "resumo_gastos_projetado": {
+        "alimentacao": 982.0,
+        "servicos": 45
+      },
+      "recomendacoes_projetadas": [
+        "Priorizar redução do nível de endividamento"
+      ]
+    }
+  },
+  {
+    "perfil_origem": "Em observação",
+    "id_cliente_origem": 1,
+    "entrada": {
+      "renda_mensal": 3651.45,
+      "nivel_endividamento": 18.4,
+      "frequencia_poupanca": "Baixa",
+      "transacoes": [
+        {
+          "descricao": "Restaurantes",
+          "valor": 2387.0
+        },
+        {
+          "descricao": "Transferências",
+          "valor": 294.0
+        },
+        {
+          "descricao": "Livros",
+          "valor": 315.0
+        },
+        {
+          "descricao": "Transferências",
+          "valor": 1032.0
+        },
+        {
+          "descricao": "Fast food",
+          "valor": 376.0
+        }
+      ],
+      "idade": 54
+    },
+    "saida_analise": {
+      "perfil_financeiro": "Em risco",
+      "probabilidade": 0.96,
+      "resumo_gastos": {
+        "alimentacao": 4404.0
+      },
+      "recomendacoes": [
+        "Rever gastos recorrentes, o comprometimento da renda está alto",
+        "Aumentar a frequência de poupança mensal"
+      ]
+    },
+    "exemplo_simulacao_nova_despesa": {
+      "perfil_atual": "Em risco",
+      "perfil_projetado": "Em risco",
+      "houve_piora": false,
+      "resumo_gastos_projetado": {
+        "alimentacao": 4404.0,
+        "servicos": 45
+      },
+      "recomendacoes_projetadas": [
+        "Rever gastos recorrentes, o comprometimento da renda está alto",
+        "Aumentar a frequência de poupança mensal"
+      ]
+    }
+  },
+  {
+    "perfil_origem": "Em risco",
+    "id_cliente_origem": 2,
+    "entrada": {
+      "renda_mensal": 3130.82,
+      "nivel_endividamento": 38.8,
+      "frequencia_poupanca": "Media",
+      "transacoes": [
+        {
+          "descricao": "Fast food",
+          "valor": 513.0
+        },
+        {
+          "descricao": "Transporte",
+          "valor": 98.0
+        },
+        {
+          "descricao": "Transporte",
+          "valor": 83.0
+        },
+        {
+          "descricao": "Combustível",
+          "valor": 1952.0
+        },
+        {
+          "descricao": "Transporte",
+          "valor": 87.0
+        }
+      ],
+      "idade": 33
+    },
+    "saida_analise": {
+      "perfil_financeiro": "Em observação",
+      "probabilidade": 0.62,
+      "resumo_gastos": {
+        "alimentacao": 2733.0
+      },
+      "recomendacoes": [
+        "Priorizar redução do nível de endividamento",
+        "Rever gastos recorrentes, o comprometimento da renda está alto"
+      ]
+    },
+    "exemplo_simulacao_nova_despesa": {
+      "perfil_atual": "Em observação",
+      "perfil_projetado": "Em observação",
+      "houve_piora": false,
+      "resumo_gastos_projetado": {
+        "alimentacao": 2733.0,
+        "servicos": 45
+      },
+      "recomendacoes_projetadas": [
+        "Priorizar redução do nível de endividamento",
+        "Rever gastos recorrentes, o comprometimento da renda está alto"
+      ]
+    }
+  }
+]
