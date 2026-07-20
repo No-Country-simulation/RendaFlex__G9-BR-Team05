@@ -1,0 +1,577 @@
+{
+  "metadata": {
+    "name": "RendaFlex API Contract",
+    "version": "1.0.0",
+    "status": "APPROVED_FOR_MVP",
+    "description": "Contrato oficial da API pública do MVP RendaFlex.",
+    "basePath": "/api/v1",
+    "contentType": "application/json",
+    "language": "en",
+    "documentationLanguage": "pt-BR",
+    "projectContext": "O RendaFlex apoia pessoas com renda variável por meio da análise do histórico financeiro, classificação de transações, recomendações e simulação de novas despesas."
+  },
+  "architecture": {
+    "frontend": {
+      "responsibilities": [
+        "Coletar e enviar somente dados financeiros brutos",
+        "Exibir as respostas da API pública e os retornos de validação"
+      ],
+      "prohibitedResponsibilities": [
+        "Calcular features do modelo",
+        "Atribuir categorias às transações",
+        "Chamar diretamente o serviço Python"
+      ]
+    },
+    "backend": {
+      "technology": "Spring Boot",
+      "responsibilities": [
+        "Validar os payloads da API pública",
+        "Aplicar as regras de negócio",
+        "Calcular todas as features usando as fórmulas validadas e documentadas pelo time de Dados",
+        "Orquestrar as chamadas ao serviço Python",
+        "Tratar erros internos e de integração",
+        "Montar a resposta pública da API"
+      ]
+    },
+    "pythonService": {
+      "visibility": "INTERNAL_ONLY",
+      "responsibilities": [
+        "Executar o modelo RandomForest de perfil financeiro",
+        "Executar o classificador de transações",
+        "Retornar previsões e probabilidades"
+      ],
+      "constraints": [
+        "Recebe do backend as features já calculadas para prever o perfil financeiro",
+        "Recebe somente description para classificar cada transação",
+        "Não recebe diretamente os payloads da API pública"
+      ]
+    }
+  },
+  "dataFlow": {
+    "financialAnalysis": [
+      "O frontend envia os dados financeiros brutos ao backend",
+      "O backend valida períodos, valores e campos obrigatórios",
+      "O backend envia ao serviço Python somente as descrições das transações EXPENSE para classificação",
+      "O backend preserva as transações INCOME sem classificação e calcula totais por categoria e features de gastos usando somente transações EXPENSE",
+      "O serviço Python prevê o perfil financeiro e sua probabilidade",
+      "O backend monta métricas, transações classificadas, recomendações e a resposta pública"
+    ],
+    "expenseSimulation": [
+      "O frontend envia o contexto financeiro completo e a nova despesa",
+      "O backend valida o contexto atual e a despesa proposta",
+      "O backend calcula as features atuais e projetadas",
+      "O serviço Python prevê os perfis atual e projetado",
+      "O backend calcula o impacto e retorna a resposta pública projetada"
+    ],
+    "transactionClassification": [
+      "O frontend envia uma ou mais transações",
+      "O backend valida os campos de entrada",
+      "O serviço Python classifica somente descrições de transações EXPENSE ou de transações sem type informado",
+      "O backend preserva transações INCOME sem predictedCategory e classificationProbability, soma somente valores EXPENSE por categoria e retorna a resposta pública"
+    ]
+  },
+  "conventions": {
+    "jsonFieldNaming": "camelCase",
+    "dtoNaming": "PascalCase",
+    "enumValueNaming": "UPPER_SNAKE_CASE",
+    "technicalIdentifiersLanguage": "en",
+    "humanReadableMessagesLanguage": "pt-BR",
+    "dateFormat": "ISO 8601 full-date (YYYY-MM-DD)",
+    "timestampFormat": "ISO 8601 offset date-time",
+    "monthFormat": "YYYY-MM",
+    "probabilityScale": {
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "percentageScale": {
+      "minimum": 0,
+      "maximum": 100,
+      "rule": "Campos terminados em Percentage usam esta escala. Variações em pontos percentuais podem ser negativas."
+    },
+    "money": {
+      "jsonType": "number",
+      "minimum": 0,
+      "currencyHandling": "Todos os valores monetários de uma requisição devem estar na mesma moeda. Conversão cambial não faz parte do MVP."
+    }
+  },
+  "businessRules": {
+    "incomeHistory": {
+      "officialVariableIncomeSource": true,
+      "minimumMonths": 3,
+      "maximumMonths": 6,
+      "uniqueMonthsRequired": true
+    },
+    "transactions": {
+      "minimumItems": 1,
+      "analysisPeriod": "Todas as datas das transações devem pertencer ao mês mais recente de incomeHistory.",
+      "primaryUse": "Consolidação de despesas e classificação por categoria",
+      "incomeTransactionRule": "INCOME é aceito no payload público e preservado na resposta, mas não é enviado ao classificador, não recebe predictedCategory nem classificationProbability, não participa de categorySummary, categoryPercentages, métricas de gastos ou recomendações baseadas em categorias e nunca substitui nem altera incomeHistory ou averageIncome.",
+      "expenseTransactionRule": "Somente transações EXPENSE são enviadas ao classificador e participam de categorySummary, categoryPercentages, métricas de gastos e recomendações baseadas em categorias.",
+      "categoryInputRule": "O cliente não envia categoria; predictedCategory é produzido pela classificação."
+    },
+    "monthlyDebts": {
+      "mvpMeaning": "monthlyDebts representa o total mensal de compromissos fixos do usuário no MVP, incluindo dívidas e parcelas recorrentes.",
+      "fixedCommitmentRule": "fixedCommitment é calculado pelo backend como monthlyDebts dividido por averageIncome e não deve ser calculado a partir do total das transações.",
+      "internalScale": "fixedCommitment usa escala de 0.0 a 1.0 no contrato interno do modelo.",
+      "publicScale": "fixedCommitmentPercentage usa escala de 0 a 100 na resposta pública."
+    },
+    "expenseSimulation": {
+      "defaultStartDateRule": "Quando startDate for omitido, o backend assume início imediato na data corrente.",
+      "projectionRule": "O backend considera installmentAmount durante installmentCount meses a partir de startDate, ou da data corrente quando ela for omitida.",
+      "profileChangedRule": "profileChanged será true somente quando currentProfile e projectedProfile forem diferentes."
+    },
+    "privacy": {
+      "excludedPublicFields": [
+        "age",
+        "gender",
+        "sourceClientId"
+      ]
+    },
+    "savingFrequency": {
+      "publicInputRule": "savingFrequency é obrigatório no contexto financeiro do MVP.",
+      "modelInputRule": "savingFrequency não é enviado diretamente ao RandomForest porque não integra a lista de features confirmada pelo time de Dados.",
+      "backendUse": "O backend pode utilizá-lo na aplicação de regras de negócio e na geração de recomendações."
+    }
+  },
+  "modelContract": {
+    "financialProfileModel": {
+      "algorithm": "RandomForest",
+      "inputOwner": "BACKEND",
+      "featureFormulaAuthority": "As fórmulas de produção são as mesmas validadas e documentadas pelo time de Dados no artefato do modelo. O backend deve implementá-las sem alterações semânticas.",
+      "inputFeatures": {
+        "averageIncome": "Média de renda calculada pelo backend a partir de incomeHistory.",
+        "incomeVariationCoefficient": "Coeficiente de variação da renda calculado pelo backend a partir de incomeHistory.",
+        "debtRatio": "Nível de endividamento calculado pelo backend a partir de monthlyDebts e averageIncome.",
+        "fixedCommitment": "Calculado pelo backend pela fórmula fixedCommitment = monthlyDebts / averageIncome. Usa escala de 0.0 a 1.0 no modelo interno e não é calculado a partir do total das transações.",
+        "categoryPercentages": "Percentuais de gastos por categoria calculados pelo backend exclusivamente a partir de transações EXPENSE classificadas. Transações INCOME não participam do cálculo. No contrato interno do modelo, os valores usam escala de 0.0 a 1.0."
+      },
+      "output": {
+        "financialProfile": "FinancialProfile",
+        "probability": "number between 0.0 and 1.0"
+      },
+      "prohibitedInputs": [
+        "age",
+        "gender",
+        "sourceClientId",
+        "rawIncomeHistory",
+        "rawTransactions"
+      ]
+    },
+    "transactionClassifier": {
+      "eligibilityRule": "Somente transações EXPENSE ou transações sem type informado na classificação isolada são enviadas ao classificador. Transações INCOME são preservadas sem classificação.",
+      "input": {
+        "description": "string"
+      },
+      "output": {
+        "predictedCategory": "TransactionCategory",
+        "classificationProbability": "number between 0.0 and 1.0"
+      }
+    }
+  },
+  "endpoints": {
+    "financialAnalysis": {
+      "method": "POST",
+      "path": "/api/v1/financial-analyses",
+      "operationId": "createFinancialAnalysis",
+      "requestDto": "FinancialAnalysisRequest",
+      "successResponseDto": "FinancialAnalysisResponse",
+      "responses": {
+        "200": "Análise financeira concluída",
+        "400": "Payload inválido",
+        "422": "Regra de negócio violada ou análise inviável",
+        "500": "Erro interno"
+      }
+    },
+    "expenseSimulation": {
+      "method": "POST",
+      "path": "/api/v1/expense-simulations",
+      "operationId": "createExpenseSimulation",
+      "requestDto": "ExpenseSimulationRequest",
+      "successResponseDto": "ExpenseSimulationResponse",
+      "responses": {
+        "200": "Simulação de despesa concluída",
+        "400": "Payload inválido",
+        "422": "Regra de negócio violada ou simulação inviável",
+        "500": "Erro interno"
+      }
+    },
+    "transactionClassification": {
+      "method": "POST",
+      "path": "/api/v1/transactions/classify",
+      "operationId": "classifyTransactions",
+      "requestDto": "TransactionClassificationRequest",
+      "successResponseDto": "TransactionClassificationResponse",
+      "responses": {
+        "200": "Transações classificadas",
+        "400": "Payload inválido",
+        "422": "Regra de negócio violada ou classificação inviável",
+        "500": "Erro interno"
+      }
+    }
+  },
+  "schemas": {
+    "FinancialAnalysisRequest": {
+      "type": "object",
+      "required": ["incomeHistory", "monthlyDebts", "savingFrequency", "transactions"],
+      "properties": {
+        "incomeHistory": {"type": "array", "items": "IncomeHistoryItem", "minItems": 3, "maxItems": 6},
+        "monthlyDebts": {"type": "number", "minimum": 0, "description": "Total mensal de compromissos fixos do usuário no MVP, incluindo dívidas e parcelas recorrentes."},
+        "savingFrequency": {"type": "SavingFrequency"},
+        "transactions": {"type": "array", "items": "TransactionInput", "minItems": 1}
+      }
+    },
+    "FinancialAnalysisResponse": {
+      "type": "object",
+      "required": ["financialProfile", "probability", "metrics", "classifiedTransactions", "categorySummary", "recommendations"],
+      "properties": {
+        "financialProfile": {"type": "FinancialProfile"},
+        "probability": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "metrics": {"type": "FinancialMetrics"},
+        "classifiedTransactions": {"type": "array", "items": "ClassifiedTransaction"},
+        "categorySummary": {"type": "CategorySummary"},
+        "recommendations": {"type": "array", "items": "Recommendation"}
+      }
+    },
+    "ExpenseSimulationRequest": {
+      "type": "object",
+      "required": ["incomeHistory", "monthlyDebts", "savingFrequency", "transactions", "newExpense"],
+      "properties": {
+        "incomeHistory": {"type": "array", "items": "IncomeHistoryItem", "minItems": 3, "maxItems": 6},
+        "monthlyDebts": {"type": "number", "minimum": 0, "description": "Total mensal de compromissos fixos do usuário no MVP, incluindo dívidas e parcelas recorrentes."},
+        "savingFrequency": {"type": "SavingFrequency"},
+        "transactions": {"type": "array", "items": "TransactionInput", "minItems": 1},
+        "newExpense": {"type": "NewExpense"}
+      }
+    },
+    "ExpenseSimulationResponse": {
+      "type": "object",
+      "required": ["newExpense", "currentProfile", "projectedProfile", "profileChanged", "impact", "projectedCategorySummary", "recommendations"],
+      "properties": {
+        "newExpense": {"type": "NewExpense"},
+        "currentProfile": {"type": "FinancialProfile"},
+        "projectedProfile": {"type": "FinancialProfile"},
+        "profileChanged": {"type": "boolean"},
+        "impact": {"type": "ExpenseImpact"},
+        "projectedCategorySummary": {"type": "CategorySummary"},
+        "recommendations": {"type": "array", "items": "Recommendation"}
+      }
+    },
+    "TransactionClassificationRequest": {
+      "type": "object",
+      "required": ["transactions"],
+      "properties": {
+        "transactions": {"type": "array", "items": "ClassificationTransactionInput", "minItems": 1}
+      }
+    },
+    "TransactionClassificationResponse": {
+      "type": "object",
+      "required": ["transactions", "categorySummary"],
+      "properties": {
+        "transactions": {"type": "array", "items": "ClassifiedTransaction"},
+        "categorySummary": {"type": "CategorySummary"}
+      }
+    },
+    "IncomeHistoryItem": {
+      "type": "object",
+      "required": ["month", "amount"],
+      "properties": {
+        "month": {"type": "string", "format": "YYYY-MM"},
+        "amount": {"type": "number", "minimum": 0}
+      }
+    },
+    "TransactionInput": {
+      "type": "object",
+      "required": ["description", "amount", "date", "type"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "amount": {"type": "number", "exclusiveMinimum": 0},
+        "date": {"type": "string", "format": "date"},
+        "type": {"type": "TransactionType"}
+      }
+    },
+    "ClassificationTransactionInput": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "amount": {"type": "number", "exclusiveMinimum": 0, "optional": true},
+        "date": {"type": "string", "format": "date", "optional": true},
+        "type": {"type": "TransactionType", "optional": true}
+      }
+    },
+    "ClassifiedTransaction": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": {"type": "string"},
+        "amount": {"type": "number", "conditional": "Presente quando informado na requisição"},
+        "date": {"type": "string", "format": "date", "conditional": "Presente quando informado na requisição"},
+        "type": {"type": "TransactionType", "conditional": "Presente quando informado na requisição"},
+        "predictedCategory": {"type": "TransactionCategory", "conditional": "Obrigatório para transações EXPENSE e para entradas sem type na classificação isolada; ausente para transações INCOME"},
+        "classificationProbability": {"type": "number", "minimum": 0.0, "maximum": 1.0, "conditional": "Obrigatório para transações EXPENSE e para entradas sem type na classificação isolada; ausente para transações INCOME"}
+      },
+      "conditionalRules": [
+        "Quando type for INCOME, predictedCategory e classificationProbability devem estar ausentes.",
+        "Quando type for EXPENSE, predictedCategory e classificationProbability são obrigatórios.",
+        "Quando type não for informado na classificação isolada, a transação é classificada e predictedCategory e classificationProbability são obrigatórios."
+      ]
+    },
+    "NewExpense": {
+      "type": "object",
+      "required": ["description", "installmentAmount", "installmentCount"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "installmentAmount": {"type": "number", "exclusiveMinimum": 0},
+        "installmentCount": {"type": "integer", "minimum": 1},
+        "startDate": {"type": "string", "format": "date", "optional": true}
+      }
+    },
+    "FinancialMetrics": {
+      "type": "object",
+      "required": ["averageIncome", "incomeVariationCoefficientPercentage", "debtRatioPercentage", "fixedCommitmentPercentage"],
+      "properties": {
+        "averageIncome": {"type": "number", "minimum": 0},
+        "incomeVariationCoefficientPercentage": {"type": "number", "minimum": 0},
+        "debtRatioPercentage": {"type": "number", "minimum": 0},
+        "fixedCommitmentPercentage": {"type": "number", "minimum": 0, "maximum": 100, "description": "fixedCommitment convertido da escala interna de 0.0 a 1.0 para a escala pública de 0 a 100."}
+      }
+    },
+    "ExpenseImpact": {
+      "type": "object",
+      "required": ["level", "newDebtRatioPercentage", "debtRatioVariationPercentagePoints"],
+      "properties": {
+        "level": {"type": "ImpactLevel"},
+        "newDebtRatioPercentage": {"type": "number", "minimum": 0},
+        "debtRatioVariationPercentagePoints": {"type": "number"}
+      }
+    },
+    "CategorySummary": {
+      "type": "object",
+      "description": "Mapa em que as chaves são valores de TransactionCategory e os valores são as somas monetárias positivas de transações EXPENSE classificadas. Transações INCOME e transações sem amount não participam dos totais.",
+      "additionalProperties": {"type": "number", "minimum": 0}
+    },
+    "Recommendation": {
+      "type": "object",
+      "required": ["priority", "message"],
+      "properties": {
+        "priority": {"type": "RecommendationPriority"},
+        "message": {"type": "string", "minLength": 1}
+      }
+    },
+    "ApiError": {
+      "type": "object",
+      "required": ["timestamp", "status", "error", "code", "message", "path", "fieldErrors"],
+      "properties": {
+        "timestamp": {"type": "string", "format": "date-time"},
+        "status": {"type": "integer"},
+        "error": {"type": "string"},
+        "code": {"type": "string"},
+        "message": {"type": "string"},
+        "path": {"type": "string"},
+        "fieldErrors": {"type": "array", "items": "FieldError"}
+      }
+    },
+    "FieldError": {
+      "type": "object",
+      "required": ["field", "code", "message"],
+      "properties": {
+        "field": {"type": "string"},
+        "code": {"type": "string"},
+        "message": {"type": "string"},
+        "rejectedValue": {"type": ["string", "number", "boolean", "null"], "optional": true}
+      }
+    }
+  },
+  "enums": {
+    "SavingFrequency": ["LOW", "MEDIUM", "HIGH"],
+    "FinancialProfile": ["HEALTHY", "UNDER_OBSERVATION", "AT_RISK"],
+    "TransactionType": ["INCOME", "EXPENSE"],
+    "ImpactLevel": ["LOW", "MODERATE", "HIGH"],
+    "RecommendationPriority": ["LOW", "MEDIUM", "HIGH"],
+    "TransactionCategory": ["FOOD", "TRANSPORT", "HOUSING", "HEALTH", "EDUCATION", "ENTERTAINMENT", "SERVICES", "TRANSFERS", "DEBTS", "FUEL", "BOOKS", "RESTAURANTS", "FAST_FOOD", "OTHER"]
+  },
+  "validations": {
+    "commonFinancialContext": [
+      "incomeHistory é obrigatório e deve conter de 3 a 6 itens",
+      "os meses de incomeHistory devem ser válidos e não podem se repetir",
+      "amount de incomeHistory deve ser maior ou igual a zero",
+      "monthlyDebts deve ser maior ou igual a zero",
+      "monthlyDebts representa o total mensal de compromissos fixos, incluindo dívidas e parcelas recorrentes",
+      "fixedCommitment deve ser calculado como monthlyDebts dividido por averageIncome e não a partir do total das transações",
+      "savingFrequency deve pertencer a SavingFrequency",
+      "transactions é obrigatório e deve conter pelo menos um item",
+      "description de cada transação deve ser preenchido",
+      "amount de cada transação deve ser maior que zero",
+      "date de cada transação deve ser válido e pertencer ao mês mais recente de incomeHistory",
+      "type de cada transação deve pertencer a TransactionType",
+      "somente transações EXPENSE devem ser classificadas e participar de categorySummary, categoryPercentages, métricas de gastos e recomendações baseadas em categorias",
+      "transações INCOME devem ser preservadas sem predictedCategory e classificationProbability e não podem alterar incomeHistory ou averageIncome"
+    ],
+    "expenseSimulation": [
+      "newExpense é obrigatório",
+      "newExpense.description deve ser preenchido",
+      "newExpense.installmentAmount deve ser maior que zero",
+      "newExpense.installmentCount deve ser um inteiro maior ou igual a um",
+      "newExpense.startDate deve ser uma data ISO 8601 válida quando informado"
+    ],
+    "isolatedClassification": [
+      "transactions é obrigatório e deve conter pelo menos um item",
+      "description é obrigatório e deve ser preenchido",
+      "amount deve ser maior que zero quando informado",
+      "date deve ser uma data ISO 8601 válida quando informado",
+      "type deve pertencer a TransactionType quando informado",
+      "transações INCOME devem ser preservadas sem predictedCategory e classificationProbability e não participam de categorySummary"
+    ],
+    "errorMapping": {
+      "syntacticOrFieldValidation": 400,
+      "crossFieldOrBusinessRule": 422,
+      "unexpectedFailure": 500
+    }
+  },
+  "errorModel": {
+    "schema": "ApiError",
+    "codes": {
+      "VALIDATION_ERROR": {"httpStatus": 400, "fieldErrorsAllowed": true},
+      "BUSINESS_RULE_ERROR": {"httpStatus": 422, "fieldErrorsAllowed": true},
+      "INTERNAL_ERROR": {"httpStatus": 500, "fieldErrorsAllowed": false}
+    },
+    "securityRule": "Exceções internas, stack traces, nomes de infraestrutura e detalhes de implementação do modelo não devem ser expostos."
+  },
+  "examples": {
+    "financialAnalysis": {
+      "request": {
+        "incomeHistory": [
+          {"month": "2026-02", "amount": 3111.86},
+          {"month": "2026-03", "amount": 2982.70},
+          {"month": "2026-04", "amount": 3248.73},
+          {"month": "2026-05", "amount": 3414.08},
+          {"month": "2026-06", "amount": 3591.01},
+          {"month": "2026-07", "amount": 3337.25}
+        ],
+        "monthlyDebts": 1214.95,
+        "savingFrequency": "HIGH",
+        "transactions": [
+          {"description": "Uber trip", "amount": 51.00, "date": "2026-07-05", "type": "EXPENSE"},
+          {"description": "Movie tickets", "amount": 120.00, "date": "2026-07-08", "type": "EXPENSE"}
+        ]
+      },
+      "response": {
+        "financialProfile": "HEALTHY",
+        "probability": 0.91,
+        "metrics": {
+          "averageIncome": 3280.94,
+          "incomeVariationCoefficientPercentage": 6.04,
+          "debtRatioPercentage": 37.03,
+          "fixedCommitmentPercentage": 37.03
+        },
+        "classifiedTransactions": [
+          {"description": "Uber trip", "amount": 51.00, "date": "2026-07-05", "type": "EXPENSE", "predictedCategory": "TRANSPORT", "classificationProbability": 0.98},
+          {"description": "Movie tickets", "amount": 120.00, "date": "2026-07-08", "type": "EXPENSE", "predictedCategory": "ENTERTAINMENT", "classificationProbability": 0.96}
+        ],
+        "categorySummary": {"TRANSPORT": 51.00, "ENTERTAINMENT": 120.00},
+        "recommendations": [
+          {"priority": "MEDIUM", "message": "Construa uma reserva para os meses de menor renda."},
+          {"priority": "HIGH", "message": "Revise os compromissos mensais antes de assumir novas despesas recorrentes."}
+        ]
+      }
+    },
+    "expenseSimulation": {
+      "request": {
+        "incomeHistory": [
+          {"month": "2026-04", "amount": 3200.00},
+          {"month": "2026-05", "amount": 3400.00},
+          {"month": "2026-06", "amount": 3100.00},
+          {"month": "2026-07", "amount": 3300.00}
+        ],
+        "monthlyDebts": 1000.00,
+        "savingFrequency": "MEDIUM",
+        "transactions": [
+          {"description": "Apartment rent", "amount": 900.00, "date": "2026-07-03", "type": "EXPENSE"},
+          {"description": "Supermarket", "amount": 380.00, "date": "2026-07-10", "type": "EXPENSE"}
+        ],
+        "newExpense": {"description": "Laptop installment", "installmentAmount": 450.00, "installmentCount": 10, "startDate": "2026-08-01"}
+      },
+      "response": {
+        "newExpense": {"description": "Laptop installment", "installmentAmount": 450.00, "installmentCount": 10, "startDate": "2026-08-01"},
+        "currentProfile": "HEALTHY",
+        "projectedProfile": "UNDER_OBSERVATION",
+        "profileChanged": true,
+        "impact": {"level": "MODERATE", "newDebtRatioPercentage": 44.62, "debtRatioVariationPercentagePoints": 13.85},
+        "projectedCategorySummary": {"HOUSING": 900.00, "FOOD": 380.00, "OTHER": 450.00},
+        "recommendations": [
+          {"priority": "HIGH", "message": "Considere uma parcela menor para preservar flexibilidade nos meses de menor renda."}
+        ]
+      }
+    },
+    "transactionClassification": {
+      "request": {
+        "transactions": [
+          {"description": "Uber trip", "amount": 51.00, "date": "2026-07-05", "type": "EXPENSE"},
+          {"description": "Netflix subscription"},
+          {"description": "Freelance payment", "amount": 850.00, "date": "2026-07-15", "type": "INCOME"}
+        ]
+      },
+      "response": {
+        "transactions": [
+          {"description": "Uber trip", "amount": 51.00, "date": "2026-07-05", "type": "EXPENSE", "predictedCategory": "TRANSPORT", "classificationProbability": 0.98},
+          {"description": "Netflix subscription", "predictedCategory": "SERVICES", "classificationProbability": 0.99},
+          {"description": "Freelance payment", "amount": 850.00, "date": "2026-07-15", "type": "INCOME"}
+        ],
+        "categorySummary": {"TRANSPORT": 51.00}
+      }
+    },
+    "errors": {
+      "validationError400": {
+        "timestamp": "2026-07-16T14:30:00-03:00",
+        "status": 400,
+        "error": "Requisição inválida",
+        "code": "VALIDATION_ERROR",
+        "message": "Um ou mais campos são inválidos.",
+        "path": "/api/v1/financial-analyses",
+        "fieldErrors": [
+          {"field": "incomeHistory", "code": "SIZE_OUT_OF_RANGE", "message": "incomeHistory deve conter de 3 a 6 itens.", "rejectedValue": null}
+        ]
+      },
+      "businessRuleError422": {
+        "timestamp": "2026-07-16T14:31:00-03:00",
+        "status": 422,
+        "error": "Entidade não processável",
+        "code": "BUSINESS_RULE_ERROR",
+        "message": "As transações devem pertencer ao mês mais recente do histórico de renda.",
+        "path": "/api/v1/expense-simulations",
+        "fieldErrors": [
+          {"field": "transactions[0].date", "code": "TRANSACTION_OUTSIDE_ANALYSIS_PERIOD", "message": "A data da transação deve pertencer a 2026-07.", "rejectedValue": "2026-06-30"}
+        ]
+      },
+      "internalError500": {
+        "timestamp": "2026-07-16T14:32:00-03:00",
+        "status": 500,
+        "error": "Erro interno do servidor",
+        "code": "INTERNAL_ERROR",
+        "message": "Ocorreu um erro inesperado.",
+        "path": "/api/v1/transactions/classify",
+        "fieldErrors": []
+      }
+    }
+  },
+  "versioning": {
+    "strategy": "Versionamento principal pela URI",
+    "currentMajorVersion": "v1",
+    "compatibilityPolicy": "Campos opcionais aditivos podem ser introduzidos na v1. Remover campos, alterar significados, mudar obrigatoriedade ou alterar a semântica de enums exige uma nova versão principal.",
+    "contractVersionPolicy": "Versões patch esclarecem a documentação ou corrigem defeitos sem quebra; versões minor adicionam recursos retrocompatíveis.",
+    "deprecationPolicy": "Elementos descontinuados devem ser anunciados e documentados antes da remoção em uma versão principal futura."
+  },
+  "glossary": {
+    "averageIncome": "Média dos valores do histórico oficial de renda.",
+    "incomeVariationCoefficient": "Coeficiente que representa a variação da renda em relação à renda média.",
+    "debtRatio": "Relação entre as dívidas mensais e a renda média.",
+    "monthlyDebts": "Total mensal de compromissos fixos do usuário no MVP, incluindo dívidas e parcelas recorrentes.",
+    "fixedCommitment": "Relação calculada pelo backend como monthlyDebts dividido por averageIncome. Usa escala de 0.0 a 1.0 no modelo interno, não utiliza o total das transações e é exposta como fixedCommitmentPercentage na escala de 0 a 100.",
+    "categoryPercentages": "Mapa de features que representa a participação de cada categoria exclusivamente nas transações EXPENSE classificadas; transações INCOME não participam.",
+    "percentagePoint": "Diferença aritmética entre dois valores percentuais.",
+    "financialProfile": "Previsão do modelo para a condição financeira atual ou projetada.",
+    "classificationProbability": "Confiança do classificador na categoria prevista, na escala de 0.0 a 1.0.",
+    "latestIncomeMonth": "Maior valor YYYY-MM presente em incomeHistory.",
+    "incomeTransaction": "Transação de receita aceita e preservada pela API pública, mas não classificada em categoria de despesa e sem participação em categorySummary, categoryPercentages, métricas de gastos, recomendações por categoria, incomeHistory ou averageIncome."
+  }
+}

@@ -1,0 +1,65 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1f2937;
+  background: #f8fafc;
+}
+
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  color: #ffffff;
+  background: #1e3a5f;
+}
+
+.app-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.app-header nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.app-header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-header a:hover,
+.app-header a.active {
+  text-decoration: underline;
+}
+
+.main-content {
+  width: min(100% - 2rem, 72rem);
+  margin: 0 auto;
+  padding: 3rem 0;
+}
+
+.main-content h1 {
+  margin: 0 0 1rem;
+}
+
+.main-content p {
+  margin: 0.5rem 0;
+}
