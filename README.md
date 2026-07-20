@@ -38,6 +38,7 @@ Traditional personal-finance tools often assume a predictable monthly salary. Th
 - [ ] Backend foundation
 - [ ] Public DTOs, validation, and controllers
 - [ ] Frontend prototype
+- [x] Frontend foundation created
 - [ ] Backend–ML service integration
 - [ ] Automated application tests
 - [ ] OCI deployment
@@ -57,6 +58,22 @@ React + TypeScript → Spring Boot → Python ML Service
 - The Python service will not receive public API payloads directly.
 
 These decisions define implementation responsibilities; they do not indicate that the application services are already operational.
+
+## Frontend Status
+
+The initial frontend foundation has been implemented with React, TypeScript, Vite, and React Router.
+
+The current prototype includes:
+
+- a shared application layout;
+- basic navigation;
+- a provisional home page;
+- a provisional financial-analysis page;
+- a provisional financial-analysis result page;
+- initial global styles;
+- production build and lint validation.
+
+The next frontend step is to implement the financial-analysis form based on the approved API contract.
 
 ## API Contract
 
@@ -92,7 +109,7 @@ The following stack represents the approved technical direction for the project,
 1. Create the Spring Boot backend foundation.
 2. Implement public DTOs and contract-aligned validation.
 3. Implement the three approved API endpoints.
-4. Create a React prototype using mock data.
+4. Continue the React prototype with the financial-analysis form and mocked results.
 5. Expose the prepared ML models through an internal Python service.
 6. Integrate the Spring Boot backend with the ML service.
 7. Add contract, unit, integration, and model-boundary tests.
