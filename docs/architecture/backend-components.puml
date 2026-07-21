@@ -1,0 +1,78 @@
+@startuml
+title Arquitetura inicial do RendaFlex
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "Usuário" as Usuario
+rectangle "Frontend\nReact + TypeScript" as Frontend
+
+package "Back-end — Spring Boot" {
+  component "FinancialAnalysisController" as FAC
+  component "ExpenseSimulationController" as ESC
+  component "TransactionClassificationController" as TCC
+
+  component "FinancialAnalysisService" as FAS
+  component "ExpenseSimulationService" as ESS
+  component "TransactionClassificationService" as TCS
+
+  component "Validation" as Validation
+  component "Mappers" as Mappers
+  component "PythonModelClient" as Client
+  component "GlobalExceptionHandler" as Errors
+}
+
+package "Serviço interno Python" {
+  component "API interna" as PythonAPI
+  component "Classificador de transações" as Classifier
+  component "Modelo de perfil financeiro" as ProfileModel
+}
+
+cloud "OCI" {
+  database "Object Storage\nmodelos serializados" as ObjectStorage
+}
+
+Usuario --> Frontend
+Frontend --> FAC : POST /api/v1/financial-analyses
+Frontend --> ESC : POST /api/v1/expense-simulations
+Frontend --> TCC : POST /api/v1/transactions/classify
+
+FAC --> Validation
+ESC --> Validation
+TCC --> Validation
+
+FAC --> FAS
+ESC --> ESS
+TCC --> TCS
+
+FAS --> Mappers
+ESS --> Mappers
+TCS --> Mappers
+
+FAS --> Client
+ESS --> Client
+TCS --> Client
+
+Client --> PythonAPI
+PythonAPI --> Classifier
+PythonAPI --> ProfileModel
+
+Classifier --> ObjectStorage : carrega artefato
+ProfileModel --> ObjectStorage : carrega artefato
+
+FAC ..> Errors
+ESC ..> Errors
+TCC ..> Errors
+Client ..> Errors
+
+note bottom of ObjectStorage
+Uso previsto para etapa posterior.
+Depende da estabilização dos modelos.
+end note
+
+note right of Validation
+A proposta em avaliação não é
+tratada como decisão aprovada.
+end note
+
+@enduml
