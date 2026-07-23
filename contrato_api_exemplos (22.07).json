@@ -1,0 +1,253 @@
+[
+  {
+    "id_cliente_origem": 5,
+    "entrada": {
+      "historico_renda": [
+        3111.86,
+        2982.7,
+        3248.73,
+        3414.08,
+        3591.01,
+        3337.25
+      ],
+      "pagamentos_mensais_dividas": 728.97,
+      "outras_despesas_fixas_mensais": 485.98,
+      "frequencia_poupanca": "Alta",
+      "transacoes": [
+        {
+          "descricao": "Transporte",
+          "valor": 1454.44
+        },
+        {
+          "descricao": "Fast food",
+          "valor": 575.1
+        },
+        {
+          "descricao": "Transferências",
+          "valor": 174.38
+        },
+        {
+          "descricao": "Carsharing",
+          "valor": 166.96
+        },
+        {
+          "descricao": "Táxi",
+          "valor": 163.25
+        },
+        {
+          "descricao": "Supermercados",
+          "valor": 148.41
+        }
+      ]
+    },
+    "saida_analise": {
+      "perfil_financeiro": "Saudável",
+      "probabilidade": 0.99,
+      "renda_media_calculada": 3280.94,
+      "coef_variacao_renda_calculado": 0.0604,
+      "nivel_endividamento_calculado": 22.2,
+      "comprometimento_fixo_calculado": 0.3703,
+      "resumo_gastos": {
+        "transporte": 1454.44,
+        "fast food": 575.1,
+        "transferencias": 174.38,
+        "carsharing": 166.96,
+        "taxi": 163.25,
+        "supermercados": 148.41
+      },
+      "recomendacoes": [
+        "Rever gastos recorrentes, o comprometimento da renda está alto"
+      ]
+    },
+    "exemplo_simulacao_nova_despesa": {
+      "nova_despesa": {
+        "descricao": "Nova assinatura de streaming",
+        "valor_parcela": 45,
+        "quantidade_parcelas": 1
+      },
+      "perfil_atual": "Saudável",
+      "perfil_projetado": "Saudável",
+      "houve_piora": false,
+      "resumo_gastos_projetado": {
+        "transporte": 1454.44,
+        "fast food": 575.1,
+        "transferencias": 174.38,
+        "carsharing": 166.96,
+        "taxi": 163.25,
+        "supermercados": 148.41,
+        "servicos": 45
+      },
+      "recomendacoes_projetadas": [
+        "Rever gastos recorrentes, o comprometimento da renda está alto"
+      ]
+    }
+  },
+  {
+    "id_cliente_origem": 1,
+    "entrada": {
+      "historico_renda": [
+        4172.47,
+        4890.16,
+        4149.63,
+        1686.74,
+        5016.41,
+        4324.43
+      ],
+      "pagamentos_mensais_dividas": 402.31,
+      "outras_despesas_fixas_mensais": 268.2,
+      "frequencia_poupanca": "Baixa",
+      "transacoes": [
+        {
+          "descricao": "Transporte",
+          "valor": 1406.54
+        },
+        {
+          "descricao": "Fast food",
+          "valor": 548.19
+        },
+        {
+          "descricao": "Transferências",
+          "valor": 230.82
+        },
+        {
+          "descricao": "Supermercados",
+          "valor": 173.11
+        },
+        {
+          "descricao": "Farmácias",
+          "valor": 97.38
+        },
+        {
+          "descricao": "Cinema",
+          "valor": 90.16
+        }
+      ]
+    },
+    "saida_analise": {
+      "perfil_financeiro": "Saudável",
+      "probabilidade": 1.0,
+      "renda_media_calculada": 4039.97,
+      "coef_variacao_renda_calculado": 0.2735,
+      "nivel_endividamento_calculado": 10.0,
+      "comprometimento_fixo_calculado": 0.166,
+      "resumo_gastos": {
+        "transporte": 1406.54,
+        "fast food": 548.19,
+        "transferencias": 230.82,
+        "supermercados": 173.11,
+        "farmacias": 97.38,
+        "cinema": 90.16
+      },
+      "recomendacoes": [
+        "Rever gastos recorrentes, o comprometimento da renda está alto",
+        "Aumentar a frequência de poupança mensal"
+      ]
+    },
+    "exemplo_simulacao_nova_despesa": {
+      "nova_despesa": {
+        "descricao": "Nova assinatura de streaming",
+        "valor_parcela": 45,
+        "quantidade_parcelas": 1
+      },
+      "perfil_atual": "Saudável",
+      "perfil_projetado": "Saudável",
+      "houve_piora": false,
+      "resumo_gastos_projetado": {
+        "transporte": 1406.54,
+        "fast food": 548.19,
+        "transferencias": 230.82,
+        "supermercados": 173.11,
+        "farmacias": 97.38,
+        "cinema": 90.16,
+        "servicos": 45
+      },
+      "recomendacoes_projetadas": [
+        "Rever gastos recorrentes, o comprometimento da renda está alto",
+        "Aumentar a frequência de poupança mensal"
+      ]
+    }
+  },
+  {
+    "id_cliente_origem": 2,
+    "entrada": {
+      "historico_renda": [
+        3288.39,
+        2695.12,
+        2786.54,
+        1095.91,
+        4630.84,
+        4084.46
+      ],
+      "pagamentos_mensais_dividas": 728.96,
+      "outras_despesas_fixas_mensais": 485.97,
+      "frequencia_poupanca": "Media",
+      "transacoes": [
+        {
+          "descricao": "Transporte",
+          "valor": 1785.32
+        },
+        {
+          "descricao": "Fast food",
+          "valor": 801.33
+        },
+        {
+          "descricao": "Transferências",
+          "valor": 329.96
+        },
+        {
+          "descricao": "Supermercados",
+          "valor": 294.61
+        },
+        {
+          "descricao": "Combustível",
+          "valor": 259.25
+        },
+        {
+          "descricao": "Táxi",
+          "valor": 241.58
+        }
+      ]
+    },
+    "saida_analise": {
+      "perfil_financeiro": "Em risco",
+      "probabilidade": 0.98,
+      "renda_media_calculada": 3096.88,
+      "coef_variacao_renda_calculado": 0.3641,
+      "nivel_endividamento_calculado": 23.5,
+      "comprometimento_fixo_calculado": 0.3923,
+      "resumo_gastos": {
+        "transporte": 1785.32,
+        "fast food": 801.33,
+        "transferencias": 329.96,
+        "supermercados": 294.61,
+        "combustivel": 259.25,
+        "taxi": 241.58
+      },
+      "recomendacoes": [
+        "Rever gastos recorrentes, o comprometimento da renda está alto"
+      ]
+    },
+    "exemplo_simulacao_nova_despesa": {
+      "nova_despesa": {
+        "descricao": "Nova assinatura de streaming",
+        "valor_parcela": 45,
+        "quantidade_parcelas": 1
+      },
+      "perfil_atual": "Em risco",
+      "perfil_projetado": "Em risco",
+      "houve_piora": false,
+      "resumo_gastos_projetado": {
+        "transporte": 1785.32,
+        "fast food": 801.33,
+        "transferencias": 329.96,
+        "supermercados": 294.61,
+        "combustivel": 259.25,
+        "taxi": 241.58,
+        "servicos": 45
+      },
+      "recomendacoes_projetadas": [
+        "Rever gastos recorrentes, o comprometimento da renda está alto"
+      ]
+    }
+  }
+]
