@@ -1,21 +1,13 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
+import { Footer } from '../components/layout/Footer'
+import { Header } from '../components/layout/Header'
 
 export function AppLayout() {
   return (
     <div className="app-layout">
-      <header className="app-header">
-        <span className="app-name">RendaFlex</span>
-        <nav aria-label="Navegação principal">
-          <NavLink to="/" end>
-            Início
-          </NavLink>
-          <NavLink to="/analysis">Análise</NavLink>
-        </nav>
-      </header>
-
-      <main className="main-content">
-        <Outlet />
-      </main>
+      <Header />
+      <main className="main-content"><Outlet /></main>
+      <Footer />
     </div>
   )
 }
