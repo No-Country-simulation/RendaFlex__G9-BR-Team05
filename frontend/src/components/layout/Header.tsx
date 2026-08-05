@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Navigation } from './Navigation'
+import { ThemeToggle } from './ThemeToggle'
 
 export function Header() {
   return (
@@ -9,7 +10,7 @@ export function Header() {
           <span className="brand-mark" aria-hidden="true">R</span>
           <span>RendaFlex</span>
         </Link>
-        <Navigation />
+        <div className="header-actions"><Navigation /><ThemeToggle /></div>
       </div>
     </header>
   )
