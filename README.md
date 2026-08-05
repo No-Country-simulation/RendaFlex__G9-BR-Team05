@@ -11,7 +11,11 @@
 </div>
 
 > [!NOTE]
-> RendaFlex is in active MVP implementation. The main modules are under development, and the mocked frontend already provides a demonstrable financial-analysis flow. Backend and Data/ML work is being aligned around the final Spring Boot–Python interface while the public contract is consolidated. Real service integration, integrated testing, and OCI deployment are still pending; the prototype should not yet be considered an operational financial service.
+> RendaFlex is in active MVP implementation. The functional frontend prototype is complete for the mocked phase and demonstrates both financial analysis and new-expense simulation through a first public Vercel deployment. The displayed results remain mocked and are not produced by operational financial models. Real integration with Spring Boot and Python, integrated testing, and OCI deployment are still pending; the public deployment is intended only for flow demonstration and validation and must not be considered an operational financial service.
+
+## Live Prototype
+
+[Open the RendaFlex frontend prototype](https://rendaflex.vercel.app/)
 
 ## About
 
@@ -37,14 +41,20 @@ Traditional personal-finance tools often assume a predictable monthly salary. Th
 - [ ] Backend orchestration, calculators, controllers, and Python gateway
 - [x] React application foundation and responsive home page
 - [x] Financial-analysis form and local validation
-- [x] Mocked asynchronous analysis flow with session-scoped state
+- [x] Mocked asynchronous financial-analysis flow
 - [x] Complete mocked financial-analysis result page
+- [x] Monthly financial commitments fields
+- [x] Mocked expense-simulation frontend
+- [x] Current-versus-projected expense-simulation result
+- [x] Light and dark theme support
+- [x] Centralized CSS color tokens
+- [x] SPA configuration for Vercel
+- [x] First public frontend prototype deployment
 - [ ] Final public API contract revision (in progress)
-- [ ] Expense-simulation frontend
 - [ ] Spring Boot–Python internal contract (under alignment)
 - [ ] Spring Boot–Python integration
 - [ ] Real frontend–backend integration
-- [ ] Automated application test suite (basic backend tests exist; expansion pending)
+- [ ] Automated application test expansion (basic backend tests exist)
 - [ ] Integrated and end-to-end validation
 - [ ] OCI deployment
 - [ ] Demo Day video
@@ -80,19 +90,21 @@ The Spring Boot–Python request/response interface, internal endpoints, timeout
 
 ## Frontend Status
 
-The functional mocked prototype uses React, TypeScript, Vite, and React Router. It currently includes:
+The complete mocked prototype uses React, TypeScript, Vite, and React Router. A shared layout and responsive Home present financial analysis and expense simulation as sequential stages. The current flow is:
 
-- a shared application layout, navigation, and responsive home page;
-- a financial-analysis form with three to six income-history months, saving-frequency selection, and dynamic transaction registration;
-- local validation for required values, duplicate months, amounts, dates, transaction types, and the analysis period;
-- a mock asynchronous analysis service;
-- Context-based analysis state with temporary `sessionStorage` persistence;
-- a result page with financial profile and probability, financial metrics, category spending summary, classified transactions with probabilities, and recommendations;
-- loading, submission-error, empty-result, and empty-section states;
-- responsive styling and accessible labels, focus states, validation feedback, and live status messages;
-- ESLint and TypeScript/Vite production-build scripts, validated during frontend development.
+```text
+Financial analysis → analysis result → expense simulation → current-versus-projected result
+```
 
-The displayed results are simulated and are not calculated from the values entered in the form. Real integration with Spring Boot is pending. The expense-simulation experience remains the next main frontend feature.
+The financial-analysis form supports three to six income-history months, saving frequency, dynamic transactions, `monthlyDebtPayments`, and `otherFixedMonthlyExpenses`. These monthly commitment fields capture debt payments separately from other fixed monthly expenses. Local validation covers required values, duplicate months, amounts, dates, transaction types, the analysis period, and monthly commitments, while a mocked asynchronous service demonstrates submission behavior.
+
+Analysis and simulation use separate Contexts and independently persist their results in `sessionStorage`. The analysis result presents the financial profile and probability, financial metrics, category summary, classified transactions, and recommendations. Expense simulation requires an existing analysis and collects only a new expense description, total amount, and installment count before presenting a mocked current-versus-projected comparison.
+
+Analysis transactions represent the user's current or already occurred financial activity. The simulated expense represents a hypothetical future decision and does not modify the current analysis. Results remain available only temporarily in the browser session; the prototype does not provide authentication, a database, continuous financial tracking, or persistent history.
+
+The frontend includes empty, loading, submission-error, and result states; responsive behavior; and accessibility-oriented labels, keyboard focus, validation feedback, and live status messages. Its visual identity uses the base palette `#061E29`, `#1D546D`, `#5F9598`, and `#F3F4F4`. Light and dark themes are managed by `ThemeProvider` and `ThemeToggle`, use system preference on the first visit, and persist the selection in `localStorage` under `rendaflex.theme`. Semantic colors are centralized through CSS Custom Properties, with no relevant hardcoded colors outside the global theme stylesheet.
+
+The frontend is deployed to Vercel as a demonstrable mocked prototype. The SPA fallback supports direct access to and refreshes on React Router routes. Both analysis and simulation results are mocked: submitted values do not generate the displayed financial results, and no real Spring Boot or Machine Learning integration exists yet.
 
 ## Backend Status
 
@@ -147,7 +159,7 @@ The final revision covers:
 - recommendation and expense-simulation response formats;
 - integration errors, timeout behavior, and internal Python endpoints.
 
-Separating `monthlyDebtPayments` from `otherFixedMonthlyExpenses` allows the system to distinguish the debt ratio from the broader fixed financial commitment. This split exists in the revised Data/ML flow but is not yet consistently operational across the public contract, frontend, and backend DTOs.
+Separating `monthlyDebtPayments` from `otherFixedMonthlyExpenses` allows the system to distinguish the debt ratio from the broader fixed financial commitment. Both fields are now present in the mocked frontend analysis form and in the revised Data/ML flow, but the public contract and backend DTOs still need to be consolidated consistently before real integration.
 
 Version `1.0.0` documents these public operations:
 
@@ -159,17 +171,19 @@ They are documented operations, not currently available endpoints. The standalon
 
 ## Technology Stack
 
-- **Frontend:** React, TypeScript, Vite, and React Router
+- **Frontend:** React, TypeScript, Vite, React Router, and CSS Custom Properties
 - **Backend:** Java and Spring Boot
 - **Data and ML:** Python, Pandas, and Scikit-learn
 - **Modeling:** Random Forest, TF-IDF, and Multinomial Naive Bayes
-- **Cloud target:** Oracle Cloud Infrastructure
+- **Current frontend hosting:** Vercel
+- **Final integrated cloud target:** Oracle Cloud Infrastructure
 - **Collaboration:** GitHub, Discord, and Trello
 
 ## Testing and Quality
 
-- The frontend provides ESLint and TypeScript/Vite production-build checks; recent frontend work records successful lint and production-build validation.
-- The frontend implements accessible validation feedback and explicit loading, error, and empty states for manual flow checks.
+- Frontend changes have been checked with ESLint, the TypeScript/Vite production build, and `git diff --check`.
+- Manual validation covers the analysis and simulation flows, direct SPA routes, light and dark themes, independent `sessionStorage` result persistence, `localStorage` theme persistence, and responsive behavior.
+- Accessibility-oriented checks cover labels, visible keyboard focus, validation feedback, and live status messages, alongside explicit loading, error, and empty states.
 - Backend branches include basic context, DTO, validation, and global-error-handler tests.
 - Broader unit coverage, contract tests, service integration tests, and end-to-end validation remain planned for the final Hackathon phase.
 - No coverage percentage or completed end-to-end suite is claimed.
@@ -177,15 +191,15 @@ They are documented operations, not currently available endpoints. The standalon
 ## Next Steps
 
 1. Finalize the public API contract revision.
-2. Finalize Spring Boot–Python request and response formats, internal endpoints, timeouts, and integration errors.
-3. Complete the mocked expense-simulation frontend.
+2. Finalize Spring Boot–Python requests, responses, internal endpoints, timeouts, and error behavior.
+3. Align categories, enums, scales, recommendations, and simulation structures across modules.
 4. Consolidate backend DTOs, validation, errors, and response structures into the integration branch.
-5. Implement backend orchestration, calculations, controllers, and the Python gateway.
-6. Integrate the financial-analysis frontend with Spring Boot.
-7. Integrate Spring Boot with the Python service and then integrate expense simulation.
-8. Align enums, scales, categories, recommendations, and error handling across all modules.
-9. Add and expand automated tests, then perform integrated and end-to-end validation.
-10. Prepare OCI deployment and stabilize the application for the final Hackathon phase.
+5. Implement backend orchestration, calculators, controllers, and the Python gateway.
+6. Integrate the deployed frontend prototype with Spring Boot.
+7. Integrate Spring Boot with the Python service.
+8. Replace mocked analysis and simulation responses with integrated service responses.
+9. Expand automated tests and perform integrated and end-to-end validation.
+10. Prepare OCI deployment and stabilize the final application.
 11. Produce the Demo Day presentation video.
 
 ## Team
@@ -204,4 +218,4 @@ The areas above describe the team's general contribution domains and do not impl
 
 RendaFlex is being developed for the **Programa ONE Hackathon**, part of **Oracle Next Education**, in collaboration with **Alura**. The project applies the program's software-development and data-learning tracks to a practical financial-inclusion challenge.
 
-The mocked frontend prototype is close to completion, and the final Hackathon phase will focus primarily on contract consolidation, real service integration, bug fixing, testing, OCI deployment, and the Demo Day video. The team expects final delivery in the penultimate week of August.
+The mocked frontend prototype is complete and publicly deployed. The next phase focuses on public and internal contract consolidation and real service integration, while expanded testing, OCI deployment, final stabilization, and Demo Day preparation remain pending. The team expects final delivery in the penultimate week of August.
