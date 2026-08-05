@@ -11,6 +11,8 @@ export type FinancialAnalysisFormState = {
   incomeHistory: IncomeHistoryFormItem[]
   savingFrequency: SavingFrequency | ''
   transactions: TransactionFormItem[]
+  monthlyDebtPayments: string
+  otherFixedMonthlyExpenses: string
 }
 
 export type TransactionFormItem = {
@@ -28,4 +30,6 @@ export type FinancialAnalysisFormErrors = {
   incomeHistory: IncomeHistoryErrors
   savingFrequency?: string
   transactions: TransactionErrors
+  monthlyDebtPayments?: string
+  otherFixedMonthlyExpenses?: string
 }

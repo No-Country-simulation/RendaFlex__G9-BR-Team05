@@ -85,6 +85,7 @@ export function FinancialAnalysisResultPage() {
       <RecommendationsSection recommendations={result.recommendations} />
 
       <nav className="result-actions" aria-label="Ações do resultado">
+        <ButtonLink to="/expense-simulation">Simular nova despesa</ButtonLink>
         <button className="button button-primary" type="button" onClick={startAgain}>Fazer nova análise</button>
         <ButtonLink to="/" variant="secondary">Voltar para o início</ButtonLink>
       </nav>

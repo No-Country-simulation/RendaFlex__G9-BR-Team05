@@ -46,8 +46,22 @@ export function validateFinancialAnalysisForm(state: FinancialAnalysisFormState)
   const savingFrequency = Object.values(SavingFrequency).includes(state.savingFrequency as SavingFrequency)
     ? undefined
     : 'Selecione a frequência de poupança.'
-  return { incomeHistory, savingFrequency, transactions }
+  const monthlyDebtPayments = state.monthlyDebtPayments === ''
+    ? 'Informe o total mensal de parcelas e dívidas.'
+    : !Number.isFinite(Number(state.monthlyDebtPayments))
+      ? 'Informe um valor válido.'
+      : Number(state.monthlyDebtPayments) < 0
+      ? 'O valor não pode ser negativo.'
+      : undefined
+  const otherFixedMonthlyExpenses = state.otherFixedMonthlyExpenses === ''
+    ? 'Informe o total de outras despesas fixas mensais.'
+    : !Number.isFinite(Number(state.otherFixedMonthlyExpenses))
+      ? 'Informe um valor válido.'
+      : Number(state.otherFixedMonthlyExpenses) < 0
+      ? 'O valor não pode ser negativo.'
+      : undefined
+  return { incomeHistory, savingFrequency, transactions, monthlyDebtPayments, otherFixedMonthlyExpenses }
 }
 
 export const hasFormErrors = (errors: FinancialAnalysisFormErrors) =>
-  Boolean(Object.keys(errors.incomeHistory).length || errors.savingFrequency || Object.keys(errors.transactions).length)
+  Boolean(Object.keys(errors.incomeHistory).length || errors.savingFrequency || Object.keys(errors.transactions).length || errors.monthlyDebtPayments || errors.otherFixedMonthlyExpenses)
