@@ -3,6 +3,8 @@ import { AppLayout } from '../layouts/AppLayout'
 import { FinancialAnalysisPage } from '../pages/financial-analysis/FinancialAnalysisPage'
 import { FinancialAnalysisResultPage } from '../pages/financial-analysis/FinancialAnalysisResultPage'
 import { HomePage } from '../pages/home/HomePage'
+import { ExpenseSimulationPage } from '../pages/expense-simulation/ExpenseSimulationPage'
+import { ExpenseSimulationResultPage } from '../pages/expense-simulation/ExpenseSimulationResultPage'
 
 export function AppRoutes() {
   return (
@@ -15,6 +17,8 @@ export function AppRoutes() {
             path="/analysis/result"
             element={<FinancialAnalysisResultPage />}
           />
+          <Route path="/expense-simulation" element={<ExpenseSimulationPage />} />
+          <Route path="/expense-simulation/result" element={<ExpenseSimulationResultPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
