@@ -36,3 +36,4 @@ export type Recommendation = {
 }
 
 export type CategorySummary = Partial<Record<TransactionCategory, number>>
+export type CategoryPercentages = Partial<Record<TransactionCategory, number>>

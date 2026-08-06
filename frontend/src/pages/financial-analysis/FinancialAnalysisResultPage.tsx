@@ -51,9 +51,8 @@ export function FinancialAnalysisResultPage() {
       </header>
 
       <aside className="demo-notice">
-        <strong>Resultado demonstrativo gerado com dados simulados.</strong>
-        <p>Os valores abaixo não foram calculados a partir dos dados preenchidos.</p>
-        <p>A integração com a API será adicionada na próxima etapa do projeto.</p>
+        <strong>Resultado de caráter informativo.</strong>
+        <p>Use os indicadores como apoio para compreender seu cenário financeiro.</p>
       </aside>
 
       <section className={`profile-summary profile-${result.financialProfile.toLowerCase()}`} aria-labelledby="profile-title">

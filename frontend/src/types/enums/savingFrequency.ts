@@ -1,7 +1,7 @@
 export const SavingFrequency = {
-  LOW: 'LOW',
-  MEDIUM: 'MEDIUM',
-  HIGH: 'HIGH',
+  RARELY: 'RARELY',
+  SOMETIMES: 'SOMETIMES',
+  OFTEN: 'OFTEN',
 } as const
 
 export type SavingFrequency =

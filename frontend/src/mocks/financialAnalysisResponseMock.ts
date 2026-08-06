@@ -12,6 +12,7 @@ export const financialAnalysisResponseMock: FinancialAnalysisResponse = {
     { description: 'Conta de internet', amount: 119.9, date: '2026-07-15', type: TransactionType.EXPENSE, predictedCategory: TransactionCategory.SERVICES, classificationProbability: 0.89 },
   ],
   categorySummary: { [TransactionCategory.FOOD]: 386.5, [TransactionCategory.TRANSPORT]: 52, [TransactionCategory.SERVICES]: 119.9 },
+  categoryPercentages: { [TransactionCategory.FOOD]: 69.22, [TransactionCategory.TRANSPORT]: 9.31, [TransactionCategory.SERVICES]: 21.47 },
   recommendations: [
     { priority: RecommendationPriority.HIGH, message: 'Revise os compromissos fixos antes de assumir novas parcelas.' },
     { priority: RecommendationPriority.MEDIUM, message: 'Mantenha uma reserva para os meses de menor renda.' },
