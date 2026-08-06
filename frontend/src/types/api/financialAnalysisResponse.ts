@@ -1,6 +1,7 @@
 import type { FinancialProfile } from '../enums/financialProfile'
 import type {
   CategorySummary,
+  CategoryPercentages,
   ClassifiedTransaction,
   FinancialMetrics,
   Recommendation,
@@ -12,5 +13,6 @@ export type FinancialAnalysisResponse = {
   metrics: FinancialMetrics
   classifiedTransactions: ClassifiedTransaction[]
   categorySummary: CategorySummary
+  categoryPercentages: CategoryPercentages
   recommendations: Recommendation[]
 }

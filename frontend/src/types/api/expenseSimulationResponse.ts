@@ -1,20 +1,26 @@
 import type { FinancialProfile } from '../enums/financialProfile'
+import type { ImpactLevel } from '../enums/impactLevel'
 import type { FinancialMetrics, Recommendation } from './common'
 
+export type SimulatedExpenseResult = {
+  description: string
+  totalAmount: number
+  installmentCount: number
+  installmentAmount: number
+}
+
+export type FinancialScenario = {
+  financialProfile: FinancialProfile
+  probability: number
+  metrics: FinancialMetrics
+}
+
 export type ExpenseSimulationResponse = {
-  simulatedExpense: {
-    description: string
-    totalAmount: number
-    installments: number
-    monthlyAmount: number
-  }
-  currentProfile: FinancialProfile
-  projectedProfile: FinancialProfile
-  currentProbability: number
-  projectedProbability: number
+  newExpense: SimulatedExpenseResult
+  currentScenario: FinancialScenario
+  projectedScenario: FinancialScenario
   profileChanged: boolean
-  monthlyInstallmentAmount: number
-  currentMetrics: FinancialMetrics
-  projectedMetrics: FinancialMetrics
+  financialHealthWorsened: boolean
+  impactLevel: ImpactLevel
   recommendations: Recommendation[]
 }

@@ -32,12 +32,6 @@ export const transactionCategoryLabels: Record<TransactionCategoryValue, string>
   [TransactionCategory.EDUCATION]: 'Educação',
   [TransactionCategory.ENTERTAINMENT]: 'Lazer',
   [TransactionCategory.SERVICES]: 'Serviços',
-  [TransactionCategory.TRANSFERS]: 'Transferências',
-  [TransactionCategory.DEBTS]: 'Dívidas',
-  [TransactionCategory.FUEL]: 'Combustível',
-  [TransactionCategory.BOOKS]: 'Livros',
-  [TransactionCategory.RESTAURANTS]: 'Restaurantes',
-  [TransactionCategory.FAST_FOOD]: 'Fast-food',
   [TransactionCategory.OTHER]: 'Outras',
 }
 
