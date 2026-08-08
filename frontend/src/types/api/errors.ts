@@ -12,17 +12,11 @@ export type ApiErrorCode =
 
 export type ApiFieldError = {
   field: string
-  code: string
   message: string
-  rejectedValue?: string | number | boolean | null
 }
 
 export type ApiError = {
-  timestamp: string
-  status: number
-  error: string
   code: ApiErrorCode
   message: string
-  path: string
   fieldErrors: ApiFieldError[]
 }

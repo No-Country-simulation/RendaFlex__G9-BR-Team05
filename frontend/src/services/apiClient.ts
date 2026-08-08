@@ -62,13 +62,13 @@ function buildUrl(path: string) {
 function isApiError(value: unknown): value is ApiError {
   if (!value || typeof value !== 'object') return false
   const candidate = value as Partial<ApiError>
-  return typeof candidate.timestamp === 'string'
-    && typeof candidate.status === 'number'
-    && typeof candidate.error === 'string'
-    && typeof candidate.code === 'string'
+  return typeof candidate.code === 'string'
     && typeof candidate.message === 'string'
-    && typeof candidate.path === 'string'
     && Array.isArray(candidate.fieldErrors)
+    && candidate.fieldErrors.every((fieldError) => Boolean(fieldError)
+      && typeof fieldError === 'object'
+      && typeof fieldError.field === 'string'
+      && typeof fieldError.message === 'string')
 }
 
 function parseJson(text: string) {
