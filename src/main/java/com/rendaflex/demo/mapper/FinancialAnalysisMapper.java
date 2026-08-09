@@ -5,6 +5,7 @@ import com.rendaflex.demo.dto.internal.InternalExpenseTransaction;
 import com.rendaflex.demo.dto.internal.InternalFinancialAnalysisRequest;
 import com.rendaflex.demo.dto.internal.InternalFinancialAnalysisResponse;
 import com.rendaflex.demo.dto.internal.InternalFinancialMetrics;
+import com.rendaflex.demo.dto.internal.InternalRecommendation;
 import com.rendaflex.demo.dto.request.FinancialAnalysisRequest;
 import com.rendaflex.demo.dto.request.IncomeHistoryItem;
 import com.rendaflex.demo.dto.request.TransactionInput;
@@ -62,14 +63,12 @@ public class FinancialAnalysisMapper {
 
     public FinancialAnalysisResponse toPublicResponse(
             FinancialAnalysisRequest originalRequest,
-            InternalFinancialAnalysisResponse internalResponse,
-            List<Recommendation> recommendations
+            InternalFinancialAnalysisResponse internalResponse
     ) {
         Objects.requireNonNull(originalRequest, "Original FinancialAnalysisRequest must not be null.");
         if (internalResponse == null) {
             throw invalidInternalResponse();
         }
-        Objects.requireNonNull(recommendations, "Recommendations must not be null.");
 
         validateProbability(internalResponse.probability());
 
@@ -80,7 +79,7 @@ public class FinancialAnalysisMapper {
                 toPublicTransactions(originalRequest.transactions(), internalResponse.classifiedTransactions()),
                 toPublicCategorySummary(internalResponse.categorySummary()),
                 toPublicCategoryPercentages(internalResponse.categoryPercentages()),
-                List.copyOf(recommendations)
+                toPublicRecommendations(internalResponse.recommendations())
         );
     }
 
@@ -163,6 +162,29 @@ public class FinancialAnalysisMapper {
                     original.type(),
                     classification.predictedCategory(),
                     classification.classificationProbability()
+            ));
+        }
+
+        return List.copyOf(result);
+    }
+
+    private List<Recommendation> toPublicRecommendations(List<InternalRecommendation> internalRecommendations) {
+        if (internalRecommendations == null) {
+            throw invalidInternalResponse();
+        }
+
+        List<Recommendation> result = new ArrayList<>(internalRecommendations.size());
+        for (InternalRecommendation recommendation : internalRecommendations) {
+            if (recommendation == null
+                    || recommendation.priority() == null
+                    || recommendation.message() == null
+                    || recommendation.message().isBlank()) {
+                throw invalidInternalResponse();
+            }
+
+            result.add(new Recommendation(
+                    recommendation.priority(),
+                    recommendation.message()
             ));
         }
 

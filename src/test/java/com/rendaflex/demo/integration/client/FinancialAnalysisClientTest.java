@@ -3,6 +3,7 @@ package com.rendaflex.demo.integration.client;
 import com.rendaflex.demo.config.PythonServiceProperties;
 import com.rendaflex.demo.dto.internal.InternalFinancialAnalysisRequest;
 import com.rendaflex.demo.dto.internal.InternalFinancialAnalysisResponse;
+import com.rendaflex.demo.enums.RecommendationPriority;
 import com.rendaflex.demo.enums.SavingFrequency;
 import com.rendaflex.demo.exception.ApiErrorCode;
 import com.rendaflex.demo.exception.BusinessRuleException;
@@ -67,6 +68,10 @@ class FinancialAnalysisClientTest {
                 com.rendaflex.demo.enums.TransactionCategory.TRANSPORT,
                 new BigDecimal("1.0")
         );
+        assertThat(response.recommendations()).hasSize(1);
+        assertThat(response.recommendations().get(0).priority()).isEqualTo(RecommendationPriority.HIGH);
+        assertThat(response.recommendations().get(0).message())
+                .isEqualTo("Revise os compromissos mensais antes de assumir novas despesas.");
         server.verify();
     }
 
@@ -232,7 +237,13 @@ class FinancialAnalysisClientTest {
                   },
                   "categoryPercentages": {
                     "TRANSPORT": 1.0
-                  }
+                  },
+                  "recommendations": [
+                    {
+                      "priority": "HIGH",
+                      "message": "Revise os compromissos mensais antes de assumir novas despesas."
+                    }
+                  ]
                 }
                 """;
     }

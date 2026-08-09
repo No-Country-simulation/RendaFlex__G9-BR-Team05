@@ -55,7 +55,13 @@ class FinancialAnalysisEndToEndTest {
               },
               "categoryPercentages": {
                 "TRANSPORT": 1.0
-              }
+              },
+              "recommendations": [
+                {
+                  "priority": "HIGH",
+                  "message": "Revise os compromissos mensais antes de assumir novas despesas."
+                }
+              ]
             }
             """;
 
@@ -123,8 +129,9 @@ class FinancialAnalysisEndToEndTest {
                 .andExpect(jsonPath("$.classifiedTransactions[1].classificationProbability").value(0.98))
                 .andExpect(jsonPath("$.categorySummary.TRANSPORT").value(51.00))
                 .andExpect(jsonPath("$.categoryPercentages.TRANSPORT").value(100.00))
-                .andExpect(jsonPath("$.recommendations").isArray())
-                .andExpect(jsonPath("$.recommendations").isEmpty());
+                .andExpect(jsonPath("$.recommendations[0].priority").value("HIGH"))
+                .andExpect(jsonPath("$.recommendations[0].message")
+                        .value("Revise os compromissos mensais antes de assumir novas despesas."));
 
         String internalRequest = LAST_INTERNAL_REQUEST.get();
 

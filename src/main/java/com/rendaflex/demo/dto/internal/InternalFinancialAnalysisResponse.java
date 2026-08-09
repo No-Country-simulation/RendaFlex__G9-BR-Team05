@@ -13,6 +13,7 @@ public record InternalFinancialAnalysisResponse(
         InternalFinancialMetrics metrics,
         List<InternalClassifiedTransaction> classifiedTransactions,
         Map<TransactionCategory, BigDecimal> categorySummary,
-        Map<TransactionCategory, BigDecimal> categoryPercentages
+        Map<TransactionCategory, BigDecimal> categoryPercentages,
+        List<InternalRecommendation> recommendations
 ) {
 }

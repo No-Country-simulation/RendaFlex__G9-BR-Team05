@@ -12,8 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.inOrder;
@@ -44,15 +42,14 @@ class PythonFinancialAnalysisGatewayTest {
 
         when(mapper.toInternalRequest(publicRequest)).thenReturn(internalRequest);
         when(client.analyze(internalRequest)).thenReturn(internalResponse);
-        when(mapper.toPublicResponse(publicRequest, internalResponse, List.of()))
-                .thenReturn(expectedResponse);
+        when(mapper.toPublicResponse(publicRequest, internalResponse)).thenReturn(expectedResponse);
 
         FinancialAnalysisResponse response = gateway.analyze(publicRequest);
 
         InOrder executionOrder = inOrder(mapper, client);
         executionOrder.verify(mapper).toInternalRequest(publicRequest);
         executionOrder.verify(client).analyze(internalRequest);
-        executionOrder.verify(mapper).toPublicResponse(publicRequest, internalResponse, List.of());
+        executionOrder.verify(mapper).toPublicResponse(publicRequest, internalResponse);
         assertSame(expectedResponse, response);
     }
 
@@ -74,10 +71,6 @@ class PythonFinancialAnalysisGatewayTest {
         );
 
         assertSame(expectedException, exception);
-        verify(mapper, never()).toPublicResponse(
-                publicRequest,
-                null,
-                List.of()
-        );
+        verify(mapper, never()).toPublicResponse(publicRequest, null);
     }
 }

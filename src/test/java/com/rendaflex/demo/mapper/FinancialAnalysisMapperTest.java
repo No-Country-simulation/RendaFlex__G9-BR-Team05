@@ -3,11 +3,11 @@ package com.rendaflex.demo.mapper;
 import com.rendaflex.demo.dto.internal.InternalClassifiedTransaction;
 import com.rendaflex.demo.dto.internal.InternalFinancialAnalysisResponse;
 import com.rendaflex.demo.dto.internal.InternalFinancialMetrics;
+import com.rendaflex.demo.dto.internal.InternalRecommendation;
 import com.rendaflex.demo.dto.request.FinancialAnalysisRequest;
 import com.rendaflex.demo.dto.request.IncomeHistoryItem;
 import com.rendaflex.demo.dto.request.TransactionInput;
 import com.rendaflex.demo.dto.response.FinancialAnalysisResponse;
-import com.rendaflex.demo.dto.response.Recommendation;
 import com.rendaflex.demo.enums.FinancialProfile;
 import com.rendaflex.demo.enums.RecommendationPriority;
 import com.rendaflex.demo.enums.SavingFrequency;
@@ -66,14 +66,11 @@ class FinancialAnalysisMapperTest {
                         classified(2, TransactionCategory.FOOD, "0.87")
                 ),
                 Map.of(TransactionCategory.TRANSPORT, bd("51.00"), TransactionCategory.FOOD, bd("200.00")),
-                Map.of(TransactionCategory.TRANSPORT, bd("0.2032"), TransactionCategory.FOOD, bd("0.7968"))
+                Map.of(TransactionCategory.TRANSPORT, bd("0.2032"), TransactionCategory.FOOD, bd("0.7968")),
+                List.of(new InternalRecommendation(RecommendationPriority.MEDIUM, "Mantenha uma reserva."))
         );
 
-        FinancialAnalysisResponse publicResponse = mapper.toPublicResponse(
-                request,
-                internal,
-                List.of(new Recommendation(RecommendationPriority.MEDIUM, "Mantenha uma reserva."))
-        );
+        FinancialAnalysisResponse publicResponse = mapper.toPublicResponse(request, internal);
 
         assertEquals(3, publicResponse.classifiedTransactions().size());
         assertEquals("Uber", publicResponse.classifiedTransactions().get(0).description());
@@ -82,6 +79,9 @@ class FinancialAnalysisMapperTest {
         assertNull(publicResponse.classifiedTransactions().get(1).predictedCategory());
         assertNull(publicResponse.classifiedTransactions().get(1).classificationProbability());
         assertEquals("Supermercado", publicResponse.classifiedTransactions().get(2).description());
+        assertEquals(1, publicResponse.recommendations().size());
+        assertEquals(RecommendationPriority.MEDIUM, publicResponse.recommendations().get(0).priority());
+        assertEquals("Mantenha uma reserva.", publicResponse.recommendations().get(0).message());
     }
 
     @Test
@@ -99,9 +99,9 @@ class FinancialAnalysisMapperTest {
                         ),
                         List.of(classified(0, TransactionCategory.TRANSPORT, "0.98")),
                         Map.of(TransactionCategory.TRANSPORT, bd("51.005")),
-                        Map.of(TransactionCategory.TRANSPORT, bd("1.0"))
-                ),
-                List.of()
+                        Map.of(TransactionCategory.TRANSPORT, bd("1.0")),
+                        List.of()
+                )
         );
 
         assertEquals(bd("3300.01"), publicResponse.metrics().averageIncome());
@@ -122,12 +122,13 @@ class FinancialAnalysisMapperTest {
                         classified(2, TransactionCategory.FOOD, "0.87")
                 ),
                 Map.of(TransactionCategory.TRANSPORT, bd("51.00")),
-                Map.of(TransactionCategory.TRANSPORT, bd("1.0"))
+                Map.of(TransactionCategory.TRANSPORT, bd("1.0")),
+                List.of()
         );
 
         ModelServiceException exception = assertThrows(
                 ModelServiceException.class,
-                () -> mapper.toPublicResponse(request, internal, List.of())
+                () -> mapper.toPublicResponse(request, internal)
         );
         assertEquals(ApiErrorCode.MODEL_SERVICE_INVALID_RESPONSE, exception.getCode());
     }
@@ -138,12 +139,13 @@ class FinancialAnalysisMapperTest {
         InternalFinancialAnalysisResponse internal = response(
                 List.of(classified(0, TransactionCategory.TRANSPORT, "0.98")),
                 Map.of(TransactionCategory.TRANSPORT, bd("51.00")),
-                Map.of(TransactionCategory.TRANSPORT, bd("1.0"))
+                Map.of(TransactionCategory.TRANSPORT, bd("1.0")),
+                List.of()
         );
 
         ModelServiceException exception = assertThrows(
                 ModelServiceException.class,
-                () -> mapper.toPublicResponse(request, internal, List.of())
+                () -> mapper.toPublicResponse(request, internal)
         );
         assertEquals(ApiErrorCode.MODEL_SERVICE_INVALID_RESPONSE, exception.getCode());
     }
@@ -156,12 +158,13 @@ class FinancialAnalysisMapperTest {
                         classified(0, TransactionCategory.FOOD, "0.80")
                 ),
                 Map.of(TransactionCategory.TRANSPORT, bd("51.00")),
-                Map.of(TransactionCategory.TRANSPORT, bd("1.0"))
+                Map.of(TransactionCategory.TRANSPORT, bd("1.0")),
+                List.of()
         );
 
         ModelServiceException exception = assertThrows(
                 ModelServiceException.class,
-                () -> mapper.toPublicResponse(requestWithSingleExpense(), internal, List.of())
+                () -> mapper.toPublicResponse(requestWithSingleExpense(), internal)
         );
         assertEquals(ApiErrorCode.MODEL_SERVICE_INVALID_RESPONSE, exception.getCode());
     }
@@ -171,28 +174,47 @@ class FinancialAnalysisMapperTest {
         InternalFinancialAnalysisResponse internal = response(
                 List.of(classified(0, TransactionCategory.TRANSPORT, "0.98")),
                 Map.of(TransactionCategory.TRANSPORT, bd("51.00")),
-                Map.of(TransactionCategory.TRANSPORT, bd("1.01"))
+                Map.of(TransactionCategory.TRANSPORT, bd("1.01")),
+                List.of()
         );
 
         ModelServiceException exception = assertThrows(
                 ModelServiceException.class,
-                () -> mapper.toPublicResponse(requestWithSingleExpense(), internal, List.of())
+                () -> mapper.toPublicResponse(requestWithSingleExpense(), internal)
         );
         assertEquals(ApiErrorCode.MODEL_SERVICE_INVALID_RESPONSE, exception.getCode());
     }
 
     @Test
-    void shouldRequireRecommendationsListInsteadOfSilentlyReplacingNull() {
+    void shouldRejectNullRecommendationsFromPython() {
         InternalFinancialAnalysisResponse internal = response(
                 List.of(classified(0, TransactionCategory.TRANSPORT, "0.98")),
                 Map.of(TransactionCategory.TRANSPORT, bd("51.00")),
-                Map.of(TransactionCategory.TRANSPORT, bd("1.0"))
+                Map.of(TransactionCategory.TRANSPORT, bd("1.0")),
+                null
         );
 
-        assertThrows(
-                NullPointerException.class,
-                () -> mapper.toPublicResponse(requestWithSingleExpense(), internal, null)
+        ModelServiceException exception = assertThrows(
+                ModelServiceException.class,
+                () -> mapper.toPublicResponse(requestWithSingleExpense(), internal)
         );
+        assertEquals(ApiErrorCode.MODEL_SERVICE_INVALID_RESPONSE, exception.getCode());
+    }
+
+    @Test
+    void shouldRejectBlankRecommendationMessageFromPython() {
+        InternalFinancialAnalysisResponse internal = response(
+                List.of(classified(0, TransactionCategory.TRANSPORT, "0.98")),
+                Map.of(TransactionCategory.TRANSPORT, bd("51.00")),
+                Map.of(TransactionCategory.TRANSPORT, bd("1.0")),
+                List.of(new InternalRecommendation(RecommendationPriority.HIGH, "   "))
+        );
+
+        ModelServiceException exception = assertThrows(
+                ModelServiceException.class,
+                () -> mapper.toPublicResponse(requestWithSingleExpense(), internal)
+        );
+        assertEquals(ApiErrorCode.MODEL_SERVICE_INVALID_RESPONSE, exception.getCode());
     }
 
     private FinancialAnalysisRequest requestWithSingleExpense() {
@@ -222,7 +244,8 @@ class FinancialAnalysisMapperTest {
     private InternalFinancialAnalysisResponse response(
             List<InternalClassifiedTransaction> classifiedTransactions,
             Map<TransactionCategory, BigDecimal> categorySummary,
-            Map<TransactionCategory, BigDecimal> categoryPercentages
+            Map<TransactionCategory, BigDecimal> categoryPercentages,
+            List<InternalRecommendation> recommendations
     ) {
         return new InternalFinancialAnalysisResponse(
                 FinancialProfile.HEALTHY,
@@ -230,7 +253,8 @@ class FinancialAnalysisMapperTest {
                 new InternalFinancialMetrics(bd("3300"), bd("0.0247"), bd("0.1818"), bd("0.4545")),
                 classifiedTransactions,
                 categorySummary,
-                categoryPercentages
+                categoryPercentages,
+                recommendations
         );
     }
 
