@@ -1,0 +1,19 @@
+package com.rendaflex.demo.dto.response;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.rendaflex.demo.enums.TransactionCategory;
+import com.rendaflex.demo.enums.TransactionType;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record ClassifiedTransaction(
+        String description,
+        BigDecimal amount,
+        LocalDate date,
+        TransactionType type,
+        TransactionCategory predictedCategory,
+        BigDecimal classificationProbability
+) {
+}
