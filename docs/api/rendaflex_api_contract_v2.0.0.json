@@ -31,7 +31,7 @@
         "Adaptar nomes, enums e escalas entre contratos",
         "Calcular installmentAmount a partir de totalAmount e installmentCount",
         "Calcular informações públicas derivadas que não sejam engenharia de features",
-        "Gerar recomendações textuais por regras determinísticas",
+        "Receber e adaptar as recomendações geradas pelo serviço Python",
         "Tratar timeout, indisponibilidade e demais falhas de integração",
         "Montar a resposta pública para o Frontend"
       ],
@@ -45,11 +45,11 @@
         "Executar o modelo de perfil financeiro e classificar transações",
         "Calcular métricas financeiras, categorySummary e categoryPercentages",
         "Realizar a projeção financeira da nova despesa",
-        "Devolver resultados estruturados ao Backend"
+        "Gerar as recomendações finais com priority e message",
+        "Devolver resultados estruturados e recomendações ao Backend"
       ],
       "constraints": [
         "categoryPercentages interno usa escala de 0.0 a 1.0",
-        "Não gera textos finais de recomendações em português",
         "Não recebe chamadas diretas do Frontend"
       ]
     }
@@ -125,9 +125,9 @@
       "impactLevelRule": "Deve considerar mudança de perfil e variação das métricas. Os limites numéricos determinísticos ficam configuráveis e serão documentados na implementação do Backend."
     },
     "recommendations": {
-      "owner": "BACKEND",
-      "rule": "O Spring Boot gera textos finais por regras determinísticas usando perfil, métricas, mudança de perfil e impacto retornados pelo Python. As regras exatas são implementadas e testadas no Backend.",
-      "pythonOutputRule": "O Python retorna dados quantitativos e estruturados, sem mensagens finais ao usuário."
+      "owner": "PYTHON",
+      "rule": "O serviço Python gera as recomendações finais com priority e message a partir dos resultados da análise ou simulação. O Spring Boot recebe essas recomendações e realiza apenas o mapeamento e as adaptações necessárias para a resposta pública.",
+      "backendRule": "O Spring Boot não gera o conteúdo textual das recomendações no fluxo atual do MVP."
     }
   },
   "publicApi": {
@@ -422,11 +422,12 @@
       },
       "InternalFinancialAnalysisResponse": {
         "type": "object", "additionalProperties": false,
-        "required": ["financialProfile", "probability", "metrics", "classifiedTransactions", "categorySummary", "categoryPercentages"],
+        "required": ["financialProfile", "probability", "metrics", "classifiedTransactions", "categorySummary", "categoryPercentages", "recommendations"],
         "properties": {
           "financialProfile": {"type": "FinancialProfile"}, "probability": {"type": "number", "minimum": 0.0, "maximum": 1.0},
           "metrics": {"type": "InternalFinancialMetrics"}, "classifiedTransactions": {"type": "array", "items": "InternalClassifiedTransaction"},
-          "categorySummary": {"type": "InternalCategorySummary"}, "categoryPercentages": {"type": "InternalCategoryPercentages"}
+          "categorySummary": {"type": "InternalCategorySummary"}, "categoryPercentages": {"type": "InternalCategoryPercentages"},
+          "recommendations": {"type": "array", "items": "Recommendation"}
         }
       },
       "InternalExpenseSimulationRequest": {
@@ -440,10 +441,11 @@
         }
       },
       "InternalExpenseSimulationResponse": {
-        "type": "object", "additionalProperties": false, "required": ["currentScenario", "projectedScenario", "quantitativeImpact"],
+        "type": "object", "additionalProperties": false, "required": ["currentScenario", "projectedScenario", "quantitativeImpact", "recommendations"],
         "properties": {
           "currentScenario": {"type": "InternalFinancialScenario"}, "projectedScenario": {"type": "InternalFinancialScenario"},
-          "quantitativeImpact": {"type": "QuantitativeImpact", "description": "Dados para o Backend calcular mudança, piora de perfil e nível de impacto."}
+          "quantitativeImpact": {"type": "QuantitativeImpact", "description": "Dados para o Backend calcular mudança, piora de perfil e nível de impacto."},
+          "recommendations": {"type": "array", "items": "Recommendation"}
         }
       },
       "InternalTransactionClassificationRequest": {
