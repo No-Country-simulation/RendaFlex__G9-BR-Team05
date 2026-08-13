@@ -1,132 +1,129 @@
 package com.rendaflex.demo.validation;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.rendaflex.demo.dto.request.FinancialAnalysisRequest;
 import com.rendaflex.demo.dto.request.IncomeHistoryItem;
 import com.rendaflex.demo.dto.request.TransactionInput;
 import com.rendaflex.demo.enums.SavingFrequency;
 import com.rendaflex.demo.enums.TransactionType;
 import com.rendaflex.demo.exception.BusinessRuleException;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FinancialAnalysisValidatorTest {
 
-    private FinancialAnalysisValidator validator;
+    private final FinancialAnalysisValidator validator = new FinancialAnalysisValidator();
 
-    @BeforeEach
-    void setUp() {
-        validator = new FinancialAnalysisValidator();
+    @Test
+    void shouldAcceptValidRequest() {
+        assertDoesNotThrow(() -> validator.validate(request(incomeHistory(), LocalDate.of(2026, 7, 15))));
     }
 
     @Test
-    void shouldAcceptValidFinancialContext() {
-        FinancialAnalysisRequest request = validRequest();
-
-        assertDoesNotThrow(() -> validator.validate(request));
-    }
-
-    @Test
-    void shouldRejectRepeatedIncomeMonths() {
-        FinancialAnalysisRequest request = new FinancialAnalysisRequest(
-                List.of(
-                        income("2026-05", "3000.00"),
-                        income("2026-06", "3200.00"),
-                        income("2026-06", "3100.00")
-                ),
-                new BigDecimal("900.00"),
-                SavingFrequency.MEDIUM,
-                List.of(expense("2026-06-10"))
+    void shouldRejectDuplicateIncomeHistoryMonth() {
+        List<IncomeHistoryItem> incomeHistory = List.of(
+                income("2026-06", "3000"),
+                income("2026-06", "3200"),
+                income("2026-07", "3100")
         );
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
-                () -> validator.validate(request)
+                () -> validator.validate(request(incomeHistory, LocalDate.of(2026, 7, 15)))
         );
 
-        assertEquals(
-                "Os meses do histórico de renda não podem se repetir.",
-                exception.getMessage()
-        );
-    }
-
-    @Test
-    void shouldRejectTransactionOutsideLatestIncomeMonth() {
-        FinancialAnalysisRequest request = new FinancialAnalysisRequest(
-                List.of(
-                        income("2026-05", "3000.00"),
-                        income("2026-06", "3200.00"),
-                        income("2026-07", "3100.00")
-                ),
-                new BigDecimal("900.00"),
-                SavingFrequency.MEDIUM,
-                List.of(expense("2026-06-30"))
-        );
-
-        BusinessRuleException exception = assertThrows(
-                BusinessRuleException.class,
-                () -> validator.validate(request)
-        );
-
-        assertEquals(
-                "A data de transactions[0] deve pertencer ao mês 2026-07.",
-                exception.getMessage()
-        );
+        assertEquals("O histórico de renda não pode conter meses duplicados.", exception.getMessage());
     }
 
     @Test
     void shouldRejectZeroAverageIncome() {
-        FinancialAnalysisRequest request = new FinancialAnalysisRequest(
-                List.of(
-                        income("2026-05", "0.00"),
-                        income("2026-06", "0.00"),
-                        income("2026-07", "0.00")
-                ),
-                BigDecimal.ZERO,
-                SavingFrequency.LOW,
-                List.of(expense("2026-07-10"))
+        List<IncomeHistoryItem> incomeHistory = List.of(
+                income("2026-05", "0"),
+                income("2026-06", "0"),
+                income("2026-07", "0")
         );
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
-                () -> validator.validate(request)
+                () -> validator.validate(request(incomeHistory, LocalDate.of(2026, 7, 15)))
+        );
+
+        assertEquals("A média da renda histórica deve ser maior que zero.", exception.getMessage());
+    }
+
+    @Test
+    void shouldAcceptHistoryWithPositiveAverageIncome() {
+        List<IncomeHistoryItem> incomeHistory = List.of(
+                income("2026-05", "0"),
+                income("2026-06", "100"),
+                income("2026-07", "0")
+        );
+
+        assertDoesNotThrow(
+                () -> validator.validate(request(incomeHistory, LocalDate.of(2026, 7, 15)))
+        );
+    }
+
+    @Test
+    void shouldAcceptTransactionInLatestIncomeHistoryMonth() {
+        assertDoesNotThrow(() -> validator.validate(request(incomeHistory(), LocalDate.of(2026, 7, 31))));
+    }
+
+    @Test
+    void shouldRejectTransactionBeforeLatestIncomeHistoryMonth() {
+        assertInvalidTransactionPeriod(LocalDate.of(2026, 6, 30));
+    }
+
+    @Test
+    void shouldRejectTransactionAfterLatestIncomeHistoryMonth() {
+        assertInvalidTransactionPeriod(LocalDate.of(2026, 8, 1));
+    }
+
+    private void assertInvalidTransactionPeriod(LocalDate transactionDate) {
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> validator.validate(request(incomeHistory(), transactionDate))
         );
 
         assertEquals(
-                "A análise financeira não pode ser realizada quando a renda média é zero.",
+                "As transações devem pertencer ao mês mais recente do histórico de renda.",
                 exception.getMessage()
         );
     }
 
-    private FinancialAnalysisRequest validRequest() {
+    private FinancialAnalysisRequest request(
+            List<IncomeHistoryItem> incomeHistory,
+            LocalDate transactionDate
+    ) {
         return new FinancialAnalysisRequest(
-                List.of(
-                        income("2026-05", "3000.00"),
-                        income("2026-06", "3200.00"),
-                        income("2026-07", "3100.00")
-                ),
-                new BigDecimal("900.00"),
-                SavingFrequency.MEDIUM,
-                List.of(expense("2026-07-10"))
+                incomeHistory,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                SavingFrequency.SOMETIMES,
+                List.of(new TransactionInput(
+                        "Supermercado",
+                        new BigDecimal("100.00"),
+                        transactionDate,
+                        TransactionType.EXPENSE
+                ))
+        );
+    }
+
+    private List<IncomeHistoryItem> incomeHistory() {
+        return List.of(
+                income("2026-05", "3000"),
+                income("2026-06", "3200"),
+                income("2026-07", "3100")
         );
     }
 
     private IncomeHistoryItem income(String month, String amount) {
         return new IncomeHistoryItem(month, new BigDecimal(amount));
-    }
-
-    private TransactionInput expense(String date) {
-        return new TransactionInput(
-                "Supermercado",
-                new BigDecimal("150.00"),
-                LocalDate.parse(date),
-                TransactionType.EXPENSE
-        );
     }
 }

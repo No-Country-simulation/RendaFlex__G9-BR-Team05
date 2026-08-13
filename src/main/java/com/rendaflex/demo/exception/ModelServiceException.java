@@ -2,11 +2,19 @@ package com.rendaflex.demo.exception;
 
 public class ModelServiceException extends RuntimeException {
 
-    public ModelServiceException(String message) {
+    private final ApiErrorCode code;
+
+    public ModelServiceException(ApiErrorCode code, String message) {
         super(message);
+        if (code != ApiErrorCode.MODEL_SERVICE_INVALID_RESPONSE
+                && code != ApiErrorCode.MODEL_SERVICE_UNAVAILABLE
+                && code != ApiErrorCode.MODEL_SERVICE_TIMEOUT) {
+            throw new IllegalArgumentException("Código inválido para falha do serviço de modelo.");
+        }
+        this.code = code;
     }
 
-    public ModelServiceException(String message, Throwable cause) {
-        super(message, cause);
+    public ApiErrorCode getCode() {
+        return code;
     }
 }

@@ -1,0 +1,10 @@
+package com.rendaflex.demo.exception;
+
+public enum ApiErrorCode {
+    VALIDATION_ERROR,
+    BUSINESS_RULE_ERROR,
+    INTERNAL_ERROR,
+    MODEL_SERVICE_INVALID_RESPONSE,
+    MODEL_SERVICE_UNAVAILABLE,
+    MODEL_SERVICE_TIMEOUT
+}

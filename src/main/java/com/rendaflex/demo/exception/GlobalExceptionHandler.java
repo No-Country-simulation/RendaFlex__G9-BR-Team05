@@ -1,139 +1,80 @@
 package com.rendaflex.demo.exception;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.util.Comparator;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidation(
-            MethodArgumentNotValidException exception,
-            HttpServletRequest request
-    ) {
-        List<FieldError> fieldErrors = exception.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error -> new FieldError(
-                        error.getField(),
-                        error.getCode() == null ? "INVALID_VALUE" : error.getCode(),
-                        error.getDefaultMessage() == null ? "Valor inválido" : error.getDefaultMessage(),
-                        error.getRejectedValue()
-                ))
+    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException exception) {
+        List<ApiFieldError> fieldErrors = exception.getBindingResult().getFieldErrors().stream()
+                .map(error -> new ApiFieldError(error.getField(), error.getDefaultMessage()))
+                .sorted(Comparator.comparing(ApiFieldError::field))
                 .toList();
 
-        return badRequest(
-                "A requisição contém campos inválidos.",
-                request.getRequestURI(),
+        return response(
+                HttpStatus.BAD_REQUEST,
+                ApiErrorCode.VALIDATION_ERROR,
+                "Existem campos inválidos na requisição.",
                 fieldErrors
         );
     }
 
-    @ExceptionHandler({
-            HttpMessageNotReadableException.class,
-            MethodArgumentTypeMismatchException.class,
-            ConstraintViolationException.class
-    })
-    public ResponseEntity<ApiError> handleMalformedRequest(
-            Exception exception,
-            HttpServletRequest request
-    ) {
-        return badRequest(
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> handleNotReadable(HttpMessageNotReadableException exception) {
+        return response(
+                HttpStatus.BAD_REQUEST,
+                ApiErrorCode.VALIDATION_ERROR,
                 "A requisição possui formato ou valores inválidos.",
-                request.getRequestURI(),
-                Collections.emptyList()
+                List.of()
         );
     }
 
     @ExceptionHandler(BusinessRuleException.class)
-    public ResponseEntity<ApiError> handleBusinessRule(
-            BusinessRuleException exception,
-            HttpServletRequest request
-    ) {
-        ApiError apiError = createError(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                "BUSINESS_RULE_ERROR",
+    public ResponseEntity<ApiError> handleBusinessRule(BusinessRuleException exception) {
+        return response(
+                HttpStatus.UNPROCESSABLE_CONTENT,
+                ApiErrorCode.BUSINESS_RULE_ERROR,
                 exception.getMessage(),
-                request.getRequestURI(),
-                Collections.emptyList()
+                List.of()
         );
-
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(apiError);
     }
 
     @ExceptionHandler(ModelServiceException.class)
-    public ResponseEntity<ApiError> handleModelService(
-            ModelServiceException exception,
-            HttpServletRequest request
-    ) {
-        ApiError apiError = createError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "INTERNAL_ERROR",
-                "Não foi possível processar a análise neste momento.",
-                request.getRequestURI(),
-                Collections.emptyList()
-        );
+    public ResponseEntity<ApiError> handleModelService(ModelServiceException exception) {
+        HttpStatus status = switch (exception.getCode()) {
+            case MODEL_SERVICE_INVALID_RESPONSE -> HttpStatus.BAD_GATEWAY;
+            case MODEL_SERVICE_UNAVAILABLE, MODEL_SERVICE_TIMEOUT -> HttpStatus.SERVICE_UNAVAILABLE;
+            default -> throw new IllegalArgumentException("Código inválido para falha do serviço de modelo.");
+        };
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+        return response(status, exception.getCode(), exception.getMessage(), List.of());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleUnexpected(
-            Exception exception,
-            HttpServletRequest request
-    ) {
-        ApiError apiError = createError(
+    public ResponseEntity<ApiError> handleUnexpected(Exception exception) {
+        return response(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "INTERNAL_ERROR",
+                ApiErrorCode.INTERNAL_ERROR,
                 "Ocorreu um erro interno inesperado.",
-                request.getRequestURI(),
-                Collections.emptyList()
+                List.of()
         );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
     }
 
-    private ResponseEntity<ApiError> badRequest(
-            String message,
-            String path,
-            List<FieldError> fieldErrors
-    ) {
-        ApiError apiError = createError(
-                HttpStatus.BAD_REQUEST,
-                "VALIDATION_ERROR",
-                message,
-                path,
-                fieldErrors
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
-    }
-
-    private ApiError createError(
+    private ResponseEntity<ApiError> response(
             HttpStatus status,
-            String code,
+            ApiErrorCode code,
             String message,
-            String path,
-            List<FieldError> fieldErrors
+            List<ApiFieldError> fieldErrors
     ) {
-        return new ApiError(
-                Instant.now(),
-                status.value(),
-                status.getReasonPhrase(),
-                code,
-                message,
-                path,
-                fieldErrors
-        );
+        return ResponseEntity.status(status).body(new ApiError(code, message, fieldErrors));
     }
 }

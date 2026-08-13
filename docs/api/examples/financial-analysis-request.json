@@ -1,0 +1,57 @@
+{
+  "incomeHistory": [
+    {
+      "month": "2026-06",
+      "amount": 4200.00
+    },
+    {
+      "month": "2026-07",
+      "amount": 3800.00
+    },
+    {
+      "month": "2026-08",
+      "amount": 4500.00
+    }
+  ],
+  "monthlyDebtPayments": 850.00,
+  "otherFixedMonthlyExpenses": 1200.00,
+  "savingFrequency": "SOMETIMES",
+  "transactions": [
+    {
+      "description": "Supermercado Angeloni",
+      "amount": 420.35,
+      "date": "2026-08-03",
+      "type": "EXPENSE"
+    },
+    {
+      "description": "Uber",
+      "amount": 36.90,
+      "date": "2026-08-04",
+      "type": "EXPENSE"
+    },
+    {
+      "description": "Farmácia",
+      "amount": 89.50,
+      "date": "2026-08-05",
+      "type": "EXPENSE"
+    },
+    {
+      "description": "Aluguel",
+      "amount": 1450.00,
+      "date": "2026-08-05",
+      "type": "EXPENSE"
+    },
+    {
+      "description": "Freelance desenvolvimento",
+      "amount": 900.00,
+      "date": "2026-08-06",
+      "type": "INCOME"
+    },
+    {
+      "description": "Netflix",
+      "amount": 44.90,
+      "date": "2026-08-07",
+      "type": "EXPENSE"
+    }
+  ]
+}

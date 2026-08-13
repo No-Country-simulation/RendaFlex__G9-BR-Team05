@@ -1,9 +1,93 @@
+import { useNavigate } from 'react-router-dom'
+import { ButtonLink } from '../../components/common/ButtonLink'
+import { CategorySummarySection } from '../../components/financial-analysis/CategorySummarySection'
+import { ClassifiedTransactionsSection } from '../../components/financial-analysis/ClassifiedTransactionsSection'
+import { RecommendationsSection } from '../../components/financial-analysis/RecommendationsSection'
+import { useFinancialAnalysis } from '../../hooks/useFinancialAnalysis'
+import {
+  financialProfileDetails,
+  formatCurrency,
+  formatPercentage,
+  formatProbability,
+} from '../../utils/financialAnalysisPresentation'
+
 export function FinancialAnalysisResultPage() {
+  const { result, clearResult } = useFinancialAnalysis()
+  const navigate = useNavigate()
+
+  if (!result) {
+    return (
+      <section className="empty-result">
+        <span className="eyebrow">Resultado indisponível</span>
+        <h1>Realize uma análise primeiro</h1>
+        <p>Não há um resultado disponível nesta sessão. Preencha o formulário para gerar uma análise.</p>
+        <div className="result-actions">
+          <ButtonLink to="/analysis">Ir para a análise</ButtonLink>
+          <ButtonLink to="/" variant="secondary">Voltar para o início</ButtonLink>
+        </div>
+      </section>
+    )
+  }
+
+  const profile = financialProfileDetails[result.financialProfile]
+  const metrics = [
+    { label: 'Renda média', value: formatCurrency(result.metrics.averageIncome) },
+    { label: 'Variação da renda', value: formatPercentage(result.metrics.incomeVariationCoefficientPercentage) },
+    { label: 'Nível de endividamento', value: formatPercentage(result.metrics.debtRatioPercentage) },
+    { label: 'Comprometimento fixo', value: formatPercentage(result.metrics.fixedCommitmentPercentage) },
+  ]
+
+  const startAgain = () => {
+    clearResult()
+    navigate('/analysis')
+  }
+
   return (
-    <section>
-      <h1>Resultado da análise financeira</h1>
-      <p>Os resultados da sua análise serão exibidos futuramente.</p>
-      <p>Esta funcionalidade ainda está em desenvolvimento.</p>
-    </section>
+    <div className="result-page">
+      <header className="page-heading">
+        <span className="eyebrow">Resultado da análise</span>
+        <h1>Seu perfil financeiro</h1>
+        <p>Confira os dados retornados pela análise financeira desta sessão.</p>
+      </header>
+
+      <aside className="demo-notice">
+        <strong>Resultado de caráter informativo.</strong>
+        <p>Use os indicadores como apoio para compreender seu cenário financeiro.</p>
+      </aside>
+
+      <section className={`profile-summary profile-${result.financialProfile.toLowerCase()}`} aria-labelledby="profile-title">
+        <div>
+          <span>Perfil financeiro</span>
+          <h2 id="profile-title">{profile.name}</h2>
+          <p>{profile.description}</p>
+        </div>
+        <div className="probability">
+          <strong>{formatProbability(result.probability)}</strong>
+          <span>probabilidade do perfil</span>
+        </div>
+      </section>
+
+      <section className="metrics-section" aria-labelledby="metrics-title">
+        <h2 id="metrics-title">Indicadores financeiros</h2>
+        <div className="metrics-grid">
+          {metrics.map((metric) => (
+            <article className="metric-card" key={metric.label}>
+              <span>{metric.label}</span>
+              <strong>{metric.value}</strong>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <CategorySummarySection categorySummary={result.categorySummary} />
+      <ClassifiedTransactionsSection transactions={result.classifiedTransactions} />
+      <RecommendationsSection recommendations={result.recommendations} />
+
+      <nav className="result-actions" aria-label="Ações do resultado">
+        <ButtonLink to="/expense-simulation">Simular nova despesa</ButtonLink>
+        <button className="button button-primary" type="button" onClick={startAgain}>Fazer nova análise</button>
+        <ButtonLink to="/" variant="secondary">Voltar para o início</ButtonLink>
+      </nav>
+    </div>
   )
 }
