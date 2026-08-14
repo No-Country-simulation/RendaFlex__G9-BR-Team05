@@ -141,4 +141,16 @@ class TransactionClassificationRequestValidationTest {
                 .extracting(violation -> violation.getMessage())
                 .contains("A descrição é obrigatória.");
     }
+
+    @Test
+    void shouldRejectNullTransactionItem() {
+        TransactionClassificationRequest request =
+                new TransactionClassificationRequest(
+                        java.util.Collections.singletonList(null)
+                );
+
+        assertThat(validator.validate(request))
+                .extracting(violation -> violation.getMessage())
+                .contains("A transação é obrigatória.");
+    }
 }
