@@ -6,6 +6,7 @@ import com.rendaflex.demo.dto.internal.InternalExpenseSimulationResponse;
 import com.rendaflex.demo.dto.internal.InternalExpenseTransaction;
 import com.rendaflex.demo.dto.internal.InternalNewExpense;
 import com.rendaflex.demo.enums.FinancialProfile;
+import com.rendaflex.demo.enums.RecommendationPriority;
 import com.rendaflex.demo.enums.SavingFrequency;
 import com.rendaflex.demo.exception.ApiErrorCode;
 import com.rendaflex.demo.exception.BusinessRuleException;
@@ -79,6 +80,14 @@ class ExpenseSimulationClientTest {
         assertThat(response.quantitativeImpact().metricVariations())
                 .containsEntry("debtRatio", new BigDecimal("0.0909"))
                 .containsEntry("fixedCommitment", new BigDecimal("0.091"));
+
+        assertThat(response.recommendations()).hasSize(1);
+
+        assertThat(response.recommendations().get(0).priority())
+                .isEqualTo(RecommendationPriority.HIGH);
+
+        assertThat(response.recommendations().get(0).message())
+                .isEqualTo("Considere uma parcela menor ou adiar a compra.");
 
         server.verify();
     }
@@ -274,7 +283,13 @@ class ExpenseSimulationClientTest {
                       "debtRatio": 0.0909,
                       "fixedCommitment": 0.091
                     }
-                  }
+                  },
+                  "recommendations": [
+                    {
+                      "priority": "HIGH",
+                      "message": "Considere uma parcela menor ou adiar a compra."
+                    }
+                  ]
                 }
                 """;
     }
