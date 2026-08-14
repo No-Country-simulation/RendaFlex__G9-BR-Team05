@@ -1,0 +1,13 @@
+tenancy_ocid       = "ocid1.tenancy.oc1..example"
+user_ocid          = "ocid1.user.oc1..example"
+fingerprint        = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
+private_key_path   = "~/.oci/oci_api_key.pem"
+region             = "sa-saopaulo-1"
+compartment_ocid   = "ocid1.compartment.oc1..example"
+vcn_cidr           = "10.0.0.0/16"
+public_subnet_cidr = "10.0.1.0/24"
+ssh_allowed_cidr   = "203.0.113.10/32"
+ssh_public_key     = "ssh-ed25519 AAAAEXAMPLE replace-with-your-public-key"
+compute_shape      = "VM.Standard.A1.Flex"
+compute_ocpus      = 2
+compute_memory_gb  = 12
