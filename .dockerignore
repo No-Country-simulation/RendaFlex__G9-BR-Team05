@@ -1,0 +1,10 @@
+.git
+.github
+target
+python-service
+data
+infra
+docs
+*.ipynb
+.vscode
+.idea
