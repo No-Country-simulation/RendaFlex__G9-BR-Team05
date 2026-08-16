@@ -20,6 +20,22 @@ resource "oci_core_network_security_group_security_rule" "rendaflex_ssh_ingress"
   }
 }
 
+resource "oci_core_network_security_group_security_rule" "rendaflex_ssh_ingress_raul" {
+  network_security_group_id = oci_core_network_security_group.rendaflex_app.id
+  direction                 = "INGRESS"
+  protocol                  = "6"
+  source                    = var.raul_ssh_cidr
+  source_type               = "CIDR_BLOCK"
+  description               = "Allows SSH access for Raul."
+
+  tcp_options {
+    destination_port_range {
+      min = 22
+      max = 22
+    }
+  }
+}
+
 resource "oci_core_network_security_group_security_rule" "rendaflex_api_ingress" {
   network_security_group_id = oci_core_network_security_group.rendaflex_app.id
   direction                 = "INGRESS"

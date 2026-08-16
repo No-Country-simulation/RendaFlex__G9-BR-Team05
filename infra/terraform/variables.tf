@@ -70,3 +70,8 @@ variable "existing_vcn_ocid" {
 variable "existing_route_table_ocid" {
   type = string
 }
+
+variable "raul_ssh_cidr" {
+  description = "CIDR do Raul, liberado pra SSH."
+  type        = string
+}
