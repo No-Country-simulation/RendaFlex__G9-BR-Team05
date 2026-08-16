@@ -165,7 +165,7 @@ class TransactionClassificationClientTest {
     @Test
     void shouldMap422ToBusinessRuleWithoutRetry() {
         server.expect(requestTo(ENDPOINT))
-                .andRespond(withStatus(HttpStatus.UNPROCESSABLE_ENTITY));
+                .andRespond(withStatus(HttpStatus.UNPROCESSABLE_CONTENT));
 
         assertThatThrownBy(() -> client.classify(requestWithAmount()))
                 .isInstanceOf(BusinessRuleException.class)
