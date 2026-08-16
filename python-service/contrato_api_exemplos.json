@@ -1,0 +1,389 @@
+[
+  {
+    "id_cliente_origem": 5,
+    "entrada": {
+      "historico_renda": [
+        3111.86,
+        2982.7,
+        3248.73,
+        3414.08,
+        3591.01,
+        3337.25
+      ],
+      "pagamentos_mensais_dividas": 728.97,
+      "outras_despesas_fixas_mensais": 485.98,
+      "frequencia_poupanca": "Alta",
+      "transacoes": [
+        {
+          "descricao": "Transporte",
+          "valor": 1471.27
+        },
+        {
+          "descricao": "Alimentação",
+          "valor": 685.17
+        },
+        {
+          "descricao": "Lazer",
+          "valor": 266.11
+        },
+        {
+          "descricao": "Saúde",
+          "valor": 159.06
+        },
+        {
+          "descricao": "Serviços",
+          "valor": 100.94
+        }
+      ]
+    },
+    "saida_analise": {
+      "financialProfile": "HEALTHY",
+      "probability": 0.99,
+      "metrics": {
+        "averageIncome": 3280.94,
+        "incomeVariationCoefficient": 0.0604,
+        "debtRatio": 0.2222,
+        "fixedCommitment": 0.3703
+      },
+      "classifiedTransactions": [
+        {
+          "sourceIndex": null,
+          "predictedCategory": "TRANSPORT",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "FOOD",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "ENTERTAINMENT",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "HEALTH",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "SERVICES",
+          "classificationProbability": 1.0
+        }
+      ],
+      "categorySummary": {
+        "TRANSPORT": 1471.27,
+        "FOOD": 685.17,
+        "ENTERTAINMENT": 266.11,
+        "HEALTH": 159.06,
+        "SERVICES": 100.94
+      },
+      "categoryPercentages": {
+        "TRANSPORT": 0.5485,
+        "FOOD": 0.2554,
+        "ENTERTAINMENT": 0.0992,
+        "HEALTH": 0.0593,
+        "SERVICES": 0.0376
+      },
+      "recommendations": [
+        {
+          "priority": "LOW",
+          "message": "Manter os hábitos financeiros atuais"
+        }
+      ]
+    },
+    "exemplo_simulacao_nova_despesa": {
+      "currentScenario": {
+        "financialProfile": "HEALTHY",
+        "probability": 0.99,
+        "metrics": {
+          "averageIncome": 3280.94,
+          "incomeVariationCoefficient": 0.0604,
+          "debtRatio": 0.2222,
+          "fixedCommitment": 0.3703
+        }
+      },
+      "projectedScenario": {
+        "financialProfile": "HEALTHY",
+        "probability": 0.99,
+        "metrics": {
+          "averageIncome": 3280.94,
+          "incomeVariationCoefficient": 0.0604,
+          "debtRatio": 0.2359,
+          "fixedCommitment": 0.384
+        }
+      },
+      "quantitativeImpact": {
+        "metricVariations": {
+          "debtRatio": 0.0137,
+          "fixedCommitment": 0.0137
+        }
+      },
+      "recommendations": [
+        {
+          "priority": "LOW",
+          "message": "Manter os hábitos financeiros atuais"
+        }
+      ]
+    }
+  },
+  {
+    "id_cliente_origem": 1,
+    "entrada": {
+      "historico_renda": [
+        4172.47,
+        4890.16,
+        4149.63,
+        1686.74,
+        5016.41,
+        4324.43
+      ],
+      "pagamentos_mensais_dividas": 402.31,
+      "outras_despesas_fixas_mensais": 268.2,
+      "frequencia_poupanca": "Baixa",
+      "transacoes": [
+        {
+          "descricao": "Transporte",
+          "valor": 1261.77
+        },
+        {
+          "descricao": "Alimentação",
+          "valor": 708.53
+        },
+        {
+          "descricao": "Lazer",
+          "valor": 336.47
+        },
+        {
+          "descricao": "Saúde",
+          "valor": 132.65
+        },
+        {
+          "descricao": "Serviços",
+          "valor": 106.77
+        }
+      ]
+    },
+    "saida_analise": {
+      "financialProfile": "HEALTHY",
+      "probability": 1.0,
+      "metrics": {
+        "averageIncome": 4039.97,
+        "incomeVariationCoefficient": 0.2735,
+        "debtRatio": 0.0996,
+        "fixedCommitment": 0.166
+      },
+      "classifiedTransactions": [
+        {
+          "sourceIndex": null,
+          "predictedCategory": "TRANSPORT",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "FOOD",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "ENTERTAINMENT",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "HEALTH",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "SERVICES",
+          "classificationProbability": 1.0
+        }
+      ],
+      "categorySummary": {
+        "TRANSPORT": 1261.77,
+        "FOOD": 708.53,
+        "ENTERTAINMENT": 336.47,
+        "HEALTH": 132.65,
+        "SERVICES": 106.77
+      },
+      "categoryPercentages": {
+        "TRANSPORT": 0.4956,
+        "FOOD": 0.2783,
+        "ENTERTAINMENT": 0.1321,
+        "HEALTH": 0.0521,
+        "SERVICES": 0.0419
+      },
+      "recommendations": [
+        {
+          "priority": "MEDIUM",
+          "message": "Aumentar a frequência de poupança mensal"
+        }
+      ]
+    },
+    "exemplo_simulacao_nova_despesa": {
+      "currentScenario": {
+        "financialProfile": "HEALTHY",
+        "probability": 1.0,
+        "metrics": {
+          "averageIncome": 4039.97,
+          "incomeVariationCoefficient": 0.2735,
+          "debtRatio": 0.0996,
+          "fixedCommitment": 0.166
+        }
+      },
+      "projectedScenario": {
+        "financialProfile": "HEALTHY",
+        "probability": 1.0,
+        "metrics": {
+          "averageIncome": 4039.97,
+          "incomeVariationCoefficient": 0.2735,
+          "debtRatio": 0.1107,
+          "fixedCommitment": 0.1771
+        }
+      },
+      "quantitativeImpact": {
+        "metricVariations": {
+          "debtRatio": 0.0111,
+          "fixedCommitment": 0.0111
+        }
+      },
+      "recommendations": [
+        {
+          "priority": "MEDIUM",
+          "message": "Aumentar a frequência de poupança mensal"
+        }
+      ]
+    }
+  },
+  {
+    "id_cliente_origem": 2,
+    "entrada": {
+      "historico_renda": [
+        3288.39,
+        2695.12,
+        2786.54,
+        1095.91,
+        4630.84,
+        4084.46
+      ],
+      "pagamentos_mensais_dividas": 728.96,
+      "outras_despesas_fixas_mensais": 485.97,
+      "frequencia_poupanca": "Media",
+      "transacoes": [
+        {
+          "descricao": "Transporte",
+          "valor": 2047.02
+        },
+        {
+          "descricao": "Alimentação",
+          "valor": 999.02
+        },
+        {
+          "descricao": "Lazer",
+          "valor": 372.19
+        },
+        {
+          "descricao": "Saúde",
+          "valor": 156.71
+        },
+        {
+          "descricao": "Serviços",
+          "valor": 137.12
+        }
+      ]
+    },
+    "saida_analise": {
+      "financialProfile": "AT_RISK",
+      "probability": 0.98,
+      "metrics": {
+        "averageIncome": 3096.88,
+        "incomeVariationCoefficient": 0.3641,
+        "debtRatio": 0.2354,
+        "fixedCommitment": 0.3923
+      },
+      "classifiedTransactions": [
+        {
+          "sourceIndex": null,
+          "predictedCategory": "TRANSPORT",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "FOOD",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "ENTERTAINMENT",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "HEALTH",
+          "classificationProbability": 1.0
+        },
+        {
+          "sourceIndex": null,
+          "predictedCategory": "SERVICES",
+          "classificationProbability": 1.0
+        }
+      ],
+      "categorySummary": {
+        "TRANSPORT": 2047.02,
+        "FOOD": 999.02,
+        "ENTERTAINMENT": 372.19,
+        "HEALTH": 156.71,
+        "SERVICES": 137.12
+      },
+      "categoryPercentages": {
+        "TRANSPORT": 0.5515,
+        "FOOD": 0.2691,
+        "ENTERTAINMENT": 0.1003,
+        "HEALTH": 0.0422,
+        "SERVICES": 0.0369
+      },
+      "recommendations": [
+        {
+          "priority": "HIGH",
+          "message": "Rever gastos recorrentes, o comprometimento da renda está alto"
+        }
+      ]
+    },
+    "exemplo_simulacao_nova_despesa": {
+      "currentScenario": {
+        "financialProfile": "AT_RISK",
+        "probability": 0.98,
+        "metrics": {
+          "averageIncome": 3096.88,
+          "incomeVariationCoefficient": 0.3641,
+          "debtRatio": 0.2354,
+          "fixedCommitment": 0.3923
+        }
+      },
+      "projectedScenario": {
+        "financialProfile": "AT_RISK",
+        "probability": 0.97,
+        "metrics": {
+          "averageIncome": 3096.88,
+          "incomeVariationCoefficient": 0.3641,
+          "debtRatio": 0.2499,
+          "fixedCommitment": 0.4068
+        }
+      },
+      "quantitativeImpact": {
+        "metricVariations": {
+          "debtRatio": 0.0145,
+          "fixedCommitment": 0.0145
+        }
+      },
+      "recommendations": [
+        {
+          "priority": "HIGH",
+          "message": "Rever gastos recorrentes, o comprometimento da renda está alto"
+        }
+      ]
+    }
+  }
+]
