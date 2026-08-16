@@ -6,8 +6,7 @@ import com.rendaflex.demo.dto.request.TransactionInput;
 import com.rendaflex.demo.exception.BusinessRuleException;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
+import java.time.YearMonth;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +54,13 @@ public class SimulationValidator {
 
         for (TransactionInput tx : transactions) {
             if (tx.date() == null) continue;
+            String txMonth = YearMonth.from(tx.date()).toString();
+
+        if (!txMonth.equals(mostRecentMonth)) {
+            throw new BusinessRuleException(
+                "A transação deve pertencer ao mês mais recente (" + mostRecentMonth + ")."
+            );
             }
         }
     }
+}

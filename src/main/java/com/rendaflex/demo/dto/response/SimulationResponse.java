@@ -1,6 +1,5 @@
 package com.rendaflex.demo.dto.response;
 
-import com.rendaflex.demo.enums.FinancialProfile;
 import com.rendaflex.demo.enums.ImpactLevel;
 
 import java.util.List;
