@@ -14,11 +14,14 @@ resource "oci_core_instance" "rendaflex" {
   compartment_id      = var.compartment_ocid
   availability_domain = data.oci_identity_availability_domains.available.availability_domains[0].name
   display_name        = "rendaflex-app"
-  shape               = var.compute_shape
+  shape                = var.compute_shape
 
-  shape_config {
-    ocpus         = var.compute_ocpus
-    memory_in_gbs = var.compute_memory_gb
+  dynamic "shape_config" {
+    for_each = can(regex("Flex", var.compute_shape)) ? [1] : []
+    content {
+      ocpus         = var.compute_ocpus
+      memory_in_gbs = var.compute_memory_gb
+    }
   }
 
   create_vnic_details {

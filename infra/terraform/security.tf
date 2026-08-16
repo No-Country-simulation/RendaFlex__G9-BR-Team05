@@ -1,6 +1,6 @@
 resource "oci_core_network_security_group" "rendaflex_app" {
   compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.rendaflex.id
+  vcn_id         = data.oci_core_vcn.existing.id
   display_name   = "rendaflex-app-nsg"
 }
 

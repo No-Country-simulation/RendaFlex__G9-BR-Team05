@@ -62,3 +62,11 @@ variable "compute_memory_gb" {
   type        = number
   default     = 12
 }
+
+variable "existing_vcn_ocid" {
+  type = string
+}
+
+variable "existing_route_table_ocid" {
+  type = string
+}

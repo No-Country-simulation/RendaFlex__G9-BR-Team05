@@ -9,5 +9,5 @@ public_subnet_cidr = "10.0.1.0/24"
 ssh_allowed_cidr   = "203.0.113.10/32"
 ssh_public_key     = "ssh-ed25519 AAAAEXAMPLE replace-with-your-public-key"
 compute_shape      = "VM.Standard.A1.Flex"
-compute_ocpus      = 2
-compute_memory_gb  = 12
+compute_ocpus      = 1
+compute_memory_gb  = 6

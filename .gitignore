@@ -40,3 +40,4 @@ build/
 !*.tfvars.example
 crash.log
 crash.*.log
+tfplan

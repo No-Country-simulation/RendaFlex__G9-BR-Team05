@@ -1,6 +1,6 @@
 output "vcn_ocid" {
   description = "OCID of the RendaFlex VCN."
-  value       = oci_core_vcn.rendaflex.id
+  value       = data.oci_core_vcn.existing.id
 }
 
 output "public_subnet_ocid" {
