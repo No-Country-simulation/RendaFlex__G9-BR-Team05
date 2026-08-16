@@ -114,13 +114,14 @@ class TransactionClassificationControllerTest {
     }
 
     @Test
-    void shouldRejectPreflightFromUnauthorizedOrigin() throws Exception {
+    void shouldAllowPreflightFromAnyOrigin() throws Exception {
         mockMvc.perform(options("/api/v1/transactions/classify")
                         .header("Origin", "http://localhost:9999")
                         .header("Access-Control-Request-Method", "POST"))
-                .andExpect(status().isForbidden())
-                .andExpect(header().doesNotExist(
-                        "Access-Control-Allow-Origin"
+                .andExpect(status().isOk())
+                .andExpect(header().string(
+                        "Access-Control-Allow-Origin",
+                        "http://localhost:9999"
                 ));
 
         verifyNoInteractions(service);
