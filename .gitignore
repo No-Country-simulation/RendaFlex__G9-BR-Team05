@@ -41,3 +41,11 @@ build/
 crash.log
 crash.*.log
 tfplan
+
+# Python virtual environment
+python-service/.venv/
+
+# Python caches
+__pycache__/
+.pytest_cache/
+*.pyc

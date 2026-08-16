@@ -1,0 +1,20 @@
+services:
+  python:
+    build:
+      context: ./python-service
+    restart: unless-stopped
+    expose:
+      - "8000"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - python
+    environment:
+      RENDAFLEX_PYTHON_BASE_URL: http://python:8000
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx384m"
+    ports:
+      - "8080:8080"
