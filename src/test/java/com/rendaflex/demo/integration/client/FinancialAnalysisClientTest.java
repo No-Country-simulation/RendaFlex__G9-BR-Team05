@@ -147,7 +147,7 @@ class FinancialAnalysisClientTest {
     @Test
     void shouldMap422ToPublicBusinessRuleWithoutRetry() {
         server.expect(requestTo(ENDPOINT))
-                .andRespond(withStatus(HttpStatus.UNPROCESSABLE_ENTITY));
+                .andRespond(withStatus(HttpStatus.UNPROCESSABLE_CONTENT));
 
         assertThatThrownBy(() -> client.analyze(request()))
                 .isInstanceOf(BusinessRuleException.class)
