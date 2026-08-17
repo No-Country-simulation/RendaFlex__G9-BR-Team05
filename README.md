@@ -201,8 +201,6 @@ All three operations are implemented and validated through the integrated produc
 ## Team
 
 - **Deane Carvalho** — Data
-- **Gabriel Nunes** — Backend
-- **Gabriel Soares** — Data
 - **Junior Ribeiro** — Data
 - **Millena Belo** — Backend
 - **Paulo Emilio** — Full Stack
