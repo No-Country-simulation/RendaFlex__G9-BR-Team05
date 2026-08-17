@@ -4,14 +4,14 @@
 
 ### Financial guidance designed for variable-income realities
 
-[![Status](https://img.shields.io/badge/status-MVP%20implementation-F59E0B?style=flat-square)](#current-progress)
+[![Status](https://img.shields.io/badge/status-MVP%20Completed%20%2F%20Production%20Ready-16A34A?style=flat-square)](#current-progress)
 
 **Programa ONE Hackathon · Oracle Next Education**
 
 </div>
 
 > [!NOTE]
-> RendaFlex is in active MVP implementation. The functional frontend prototype is complete and demonstrates both financial analysis and new-expense simulation through a first public Vercel deployment. It can use mocks or the public API, and the Spring Boot public layer for financial analysis is implemented. The concrete Spring Boot–Python gateway, complete integrated testing, and OCI deployment are still pending; the public deployment is intended only for flow demonstration and validation and must not be considered an operational financial service.
+> RendaFlex is 100% integrated, functional, and running in production. The end-to-end solution operates from the Vercel frontend through the Java Spring Boot backend on OCI Compute to the Python/ML microservice on OCI Compute, with saved-model persistence and artifact support in OCI Object Storage.
 
 ## Live Prototype
 
@@ -19,7 +19,7 @@
 
 ## About
 
-RendaFlex is a financial decision-support project for people whose income changes from month to month. The MVP turns financial history and transaction data into a financial-profile analysis, expense simulations, classified transactions, financial indicators, recommendations, and a simple dashboard, with public REST API responses represented as JSON.
+RendaFlex is a financial decision-support project for people whose income changes from month to month. The completed MVP turns financial history and transaction data into a financial-profile analysis, expense simulations, classified transactions, financial indicators, recommendations, and a simple dashboard through production REST APIs.
 
 ## Problem
 
@@ -33,72 +33,69 @@ Traditional personal-finance tools often assume a predictable monthly salary. Th
 - [x] Financial feature engineering developed in the Data/ML notebook
 - [x] Transaction-classification model trained and evaluated
 - [x] Financial-profile model trained and evaluated
-- [x] Model serialization prepared in the Data/ML notebook
-- [x] Expense-simulation logic prepared in the Data/ML notebook
-- [x] Repository and initial architecture/API documentation created
-- [x] Spring Boot foundation created
-- [x] Public DTOs, enums, validation, and standardized errors for financial analysis
-- [x] Financial-analysis controller, service, business validation, CORS, and public-layer tests
-- [ ] Concrete Python gateway and integrated backend orchestration
-- [x] React application foundation and responsive home page
-- [x] Financial-analysis form and local validation
-- [x] Mocked asynchronous financial-analysis flow
-- [x] Complete mocked financial-analysis result page
-- [x] Monthly financial commitments fields
-- [x] Mocked expense-simulation frontend
-- [x] Current-versus-projected expense-simulation result
-- [x] Light and dark theme support
-- [x] Centralized CSS color tokens
-- [x] SPA configuration for Vercel
-- [x] First public frontend prototype deployment
-- [x] Final public API contract revision
-- [x] Spring Boot–Python internal contract defined for the MVP
-- [ ] Spring Boot–Python integration
-- [ ] Real frontend–backend integration
-- [x] Financial-analysis public-layer automated test suite
-- [ ] Automated test expansion for the remaining integrated flows
-- [ ] Integrated and end-to-end validation
-- [ ] OCI deployment
-- [ ] Demo Day video
+- [x] Model serialization prepared and validated
+- [x] Expense-simulation logic implemented
+- [x] Repository, architecture, and API documentation created
+- [x] Spring Boot foundation, public API, validation, CORS, and standardized errors
+- [x] Concrete Python gateway and integrated backend orchestration
+- [x] React application foundation and responsive financial-analysis flow
+- [x] Complete replacement of mocks with the real production API
+- [x] Expense simulation and current-versus-projected result
+- [x] Light and dark theme support, semantic icons, and UX/UI refinements
+- [x] SPA configuration and production deployment on Vercel
+- [x] Final public API and Spring Boot–Python internal contracts
+- [x] Spring Boot–Python HTTP integration and error handling
+- [x] Automated unit and integration test suites
+- [x] Integrated and end-to-end validation
+- [x] Containerized Docker deployment on OCI Compute with OCI Object Storage artifacts
+- [x] Demo Day presentation and demonstration preparation
 
 ## Current Technical Decisions
 
-The application boundary is:
+The application boundary is deployed in Docker containers on Oracle Cloud Infrastructure:
 
 ```text
-React + TypeScript → Spring Boot → Python ML Service
+React + TypeScript (Vercel) → Spring Boot (OCI Compute / Docker) → Python ML Service (OCI Compute / Docker)
+                                                    ↘ OCI Object Storage
 ```
 
 ### Frontend
 
 - collects raw financial data and performs user-interface validation;
-- is designed to submit public API requests to Spring Boot and display analysis and simulation responses;
+- consumes the real production Spring Boot REST API with `VITE_USE_MOCK_API=false`;
+- displays financial analysis and expense-simulation responses;
 - does not calculate financial features, classify transactions, or call Python directly.
 
 ### Spring Boot backend
 
 - validates public requests, adapts fields, enums, and scales, and orchestrates use cases;
-- will handle Python communication failures and timeouts and compose the final public response;
-- may perform backend-specific calculations such as scale conversion, response-derived information, and simulation support;
+- communicates with Python through the implemented `FinancialAnalysisGateway` HTTP integration;
+- handles Python communication failures and timeouts and composes final public responses;
+- performs backend-specific calculations, including expense-simulation support;
 - does not duplicate the feature engineering owned by Python.
 
 ### Python service
 
 - receives the internal data required for analysis and calculates model features;
 - runs the financial-profile model and transaction classifier;
-- returns predictions, probabilities, and derived data required by the backend.
+- returns predictions, probabilities, classified transactions, and derived data required by the backend;
+- is containerized and deployed on OCI Compute with the integrated application stack.
 
-The Spring Boot–Python request/response interface, internal endpoints, timeout behavior, and error mapping are defined by the final MVP contract. Their concrete implementation is still pending. The frontend never sends the public payload directly to Python.
+### Model Loading Decision
+
+For the MVP, the serialized `.pkl` AI models are kept and packaged directly in the Python Docker image through `COPY`. This engineering decision ensures autonomous initialization, high availability, and predictable zero-risk startup behavior. Uploading the same artifacts to OCI Object Storage provides a proof of concept and an artifact repository; dynamic runtime download from Object Storage is intentionally mapped as a post-MVP evolution.
+
+The frontend never sends the public payload directly to Python.
 
 ## Frontend Status
 
-The functional prototype uses React, TypeScript, Vite, and React Router. A shared layout and responsive Home present financial analysis and expense simulation as sequential stages. The current flow is:
+The production frontend uses React 19, TypeScript, Vite, React Router, and Vercel. A shared layout and responsive Home present financial analysis and expense simulation as sequential stages:
 
 ```text
 Financial analysis → analysis result → expense simulation → current-versus-projected result
 ```
 
-The financial-analysis form supports three to six income-history months, saving frequency, dynamic transactions, `monthlyDebtPayments`, and `otherFixedMonthlyExpenses`. These monthly commitment fields capture debt payments separately from other fixed monthly expenses. Local validation covers required values, duplicate months, amounts, dates, transaction types, the analysis period, and monthly commitments. Service adapters allow the flow to use mocks or the real public API according to `VITE_USE_MOCK_API`; when disabled, `VITE_API_BASE_URL` defines the Spring Boot base URL and there is no silent fallback to mocks.
+The financial-analysis form supports three to six income-history months, saving frequency, dynamic transactions, `monthlyDebtPayments`, and `otherFixedMonthlyExpenses`. Local validation covers required values, duplicate months, amounts, dates, transaction types, the analysis period, and monthly commitments. With `VITE_USE_MOCK_API=false`, the production frontend uses `VITE_API_BASE_URL` to consume the real Spring Boot REST API without a mock fallback.
 
 The real financial-analysis request path is:
 
@@ -106,32 +103,26 @@ The real financial-analysis request path is:
 FinancialAnalysisPage → financialAnalysisService → financialAnalysisApi → apiClient → POST /api/v1/financial-analyses
 ```
 
-The API client also handles the final public `ApiError` format defined by contract version `2.0.0`.
+The API client handles the public `ApiError` format defined by contract version `2.0.0`. Analysis and simulation use separate Contexts and independently persist results in `sessionStorage`.
 
-Analysis and simulation use separate Contexts and independently persist their results in `sessionStorage`. The analysis result presents the financial profile and probability, financial metrics, category summary, classified transactions, and recommendations. Expense simulation requires an existing analysis and collects only a new expense description, total amount, and installment count before presenting a mocked current-versus-projected comparison.
+The interface includes semantic `lucide-react` icons, fade-slide-up animations, semantic profile progress bars, and tabular numerals for currency values. It provides empty, loading, submission-error, and result states; responsive behavior; accessibility-oriented labels; keyboard focus; validation feedback; and live status messages. Light and dark themes are managed by `ThemeProvider` and `ThemeToggle`, use system preference on the first visit, and persist the selection in `localStorage` under `rendaflex-theme`.
 
-Analysis transactions represent the user's current or already occurred financial activity. The simulated expense represents a hypothetical future decision and does not modify the current analysis. Results remain available only temporarily in the browser session; the prototype does not provide authentication, a database, continuous financial tracking, or persistent history.
-
-The frontend includes empty, loading, submission-error, and result states; responsive behavior; and accessibility-oriented labels, keyboard focus, validation feedback, and live status messages. Its visual identity uses the base palette `#061E29`, `#1D546D`, `#5F9598`, and `#F3F4F4`. Light and dark themes are managed by `ThemeProvider` and `ThemeToggle`, use system preference on the first visit, and persist the selection in `localStorage` under `rendaflex.theme`. Semantic colors are centralized through CSS Custom Properties, with no relevant hardcoded colors outside the global theme stylesheet.
-
-The frontend is deployed to Vercel as a demonstrable prototype. The SPA fallback supports direct access to and refreshes on React Router routes. Mocked analysis and simulation remain available, and the frontend is prepared to consume the public API. The real end-to-end flow has not been validated because the concrete Spring Boot–Python gateway is not yet implemented.
+The Vercel deployment supports SPA fallback for direct access to and refreshes on React Router routes. The production flow is fully validated against the real backend and ML service.
 
 ## Backend Status
 
-The Spring Boot public layer for `POST /api/v1/financial-analyses` includes:
+The Spring Boot production API includes:
 
-- `FinancialAnalysisController`, `FinancialAnalysisService`, and `FinancialAnalysisValidator`;
+- `FinancialAnalysisController`, `FinancialAnalysisService`, `FinancialAnalysisValidator`, and `FinancialAnalysisGateway`;
 - public version `2.0.0` request and response DTOs and enums;
-- Bean Validation and public financial-context business rules;
-- `GlobalExceptionHandler` and standardized responses for HTTP 400, 422, 500, 502, and 503;
-- global CORS configuration for the local frontend;
-- `FinancialAnalysisGateway` as the integration boundary;
-- 26 passing public-layer tests;
+- Bean Validation, financial-context business rules, and standardized error responses;
+- global CORS configuration for the Vercel frontend;
+- HTTP integration from Spring Boot to the Python FastAPI service, including timeout and error handling;
+- expense-simulation calculation and integrated response composition;
+- successful automated unit and integration test suites, including 132 unit tests;
 - a public request example at `docs/api/examples/financial-analysis-request.json`.
 
-The application compiles and reaches Spring Boot and Tomcat startup. The financial-analysis flow is not operational end to end because no concrete Spring bean implements `FinancialAnalysisGateway`. The integration still requires internal DTOs, an HTTP client, `sourceIndex` correlation, timeout and retry handling, the internal Python call, and response adaptation. Textual recommendations remain a backend responsibility; `categorySummary` and `categoryPercentages` are calculated in the Python flow and adapted by the backend.
-
-The public expense-simulation and standalone transaction-classification endpoints are defined by the contract but are not implemented in the current backend layer. No production-ready integrated backend is claimed.
+The backend is containerized with Docker and deployed on OCI Compute. Financial analysis, expense simulation, and the Python-backed transaction-classification flow are operational end to end.
 
 ## Data and ML Status
 
@@ -140,16 +131,17 @@ The versioned notebooks and generated sample data document:
 - evaluation and preparation of the original transaction dataset;
 - a synthetic financial-profile dataset and exploratory analysis;
 - preprocessing and feature engineering;
-- a TF-IDF and Multinomial Naive Bayes transaction-classification experiment;
+- a TF-IDF and Multinomial Naive Bayes transaction-classification model;
 - a Random Forest financial-profile model, evaluation, and feature-importance analysis;
-- `joblib` serialization preparation for the models, vectorizer, and feature list;
-- analysis and expense-simulation functions prepared in the notebook;
-- calculations for average income, income variation, debt ratio, fixed commitment, and category spending summaries;
-- separate monthly debt payments and other fixed monthly expenses in the revised notebook flow.
+- validated `joblib` serialization for the models, vectorizer, and feature list;
+- integrated analysis and expense-simulation functions;
+- calculations for average income, income variation, debt ratio, fixed commitment, and category spending summaries.
 
-The final public classifier categories are `FOOD`, `TRANSPORT`, `HEALTH`, `HOUSING`, `EDUCATION`, `ENTERTAINMENT`, `SERVICES`, and `OTHER`. Dataset categories must be normalized to this contract enum. Internal notebook variables may remain in Portuguese, but attributes exchanged across service boundaries use English.
+The trained Random Forest profile model and Multinomial Naive Bayes/TF-IDF transaction classifier are serialized, validated, and served by the Python microservice in the OCI ecosystem. Their `.pkl` artifacts are packaged in the production Docker image and managed as artifacts in OCI Object Storage.
 
-`categoryPercentages` is not an input feature for the Random Forest model, and the model is not retrained solely to include it. It is informative output derived from `categorySummary`, calculated on a `0.0` to `1.0` internal scale and adapted by the backend to the public `0` to `100` scale.
+The final public classifier categories are `FOOD`, `TRANSPORT`, `HEALTH`, `HOUSING`, `EDUCATION`, `ENTERTAINMENT`, `SERVICES`, and `OTHER`. Dataset categories are normalized to this contract enum. Internal notebook variables may remain in Portuguese, but attributes exchanged across service boundaries use English.
+
+`categoryPercentages` is not an input feature for the Random Forest model. It is informative output derived from `categorySummary`, calculated on a `0.0` to `1.0` internal scale and adapted by the backend to the public `0` to `100` scale.
 
 ## API Contract
 
@@ -171,44 +163,40 @@ Version `2.0.0` establishes:
 - recommendation and expense-simulation response formats;
 - integration errors, timeout behavior, and internal Python endpoints.
 
-Separating `monthlyDebtPayments` from `otherFixedMonthlyExpenses` allows the system to distinguish the debt ratio from the broader fixed financial commitment. Both fields are present in the frontend analysis form, the public financial-analysis DTOs, and the revised Data/ML flow.
-
 Version `2.0.0` defines these public operations:
 
 - `POST /api/v1/financial-analyses`
 - `POST /api/v1/expense-simulations`
 - `POST /api/v1/transactions/classify`
 
-The public layer for `POST /api/v1/financial-analyses` is implemented, but its end-to-end flow awaits the concrete Spring Boot–Python gateway. The expense-simulation and standalone transaction-classification operations remain contracted but are not implemented as public backend endpoints.
+All three operations are implemented and validated through the integrated production stack.
 
 ## Technology Stack
 
-- **Frontend:** React, TypeScript, Vite, React Router, and CSS Custom Properties
+- **Frontend:** React 19, TypeScript, Vite, React Router, lucide-react, and CSS Custom Properties
 - **Backend:** Java and Spring Boot
-- **Data and ML:** Python, Pandas, and Scikit-learn
+- **Data and ML:** Python, FastAPI, Pandas, and Scikit-learn
 - **Modeling:** Random Forest, TF-IDF, and Multinomial Naive Bayes
-- **Current frontend hosting:** Vercel
-- **Final integrated cloud target:** Oracle Cloud Infrastructure
+- **Hosting:** Vercel and Oracle Cloud Infrastructure (OCI Compute + Object Storage)
+- **Containerization:** Docker
 - **Collaboration:** GitHub, Discord, and Trello
 
 ## Testing and Quality
 
 - Frontend changes have been checked with ESLint, TypeScript, the Vite production build, and `git diff --check`.
-- Manual validation covers the analysis and simulation flows, direct SPA routes, light and dark themes, independent `sessionStorage` result persistence, `localStorage` theme persistence, and responsive behavior.
+- Manual validation covers the real analysis and simulation flows, direct SPA routes, light and dark themes, independent `sessionStorage` result persistence, `localStorage` theme persistence, and responsive behavior.
 - Accessibility-oriented checks cover labels, visible keyboard focus, validation feedback, and live status messages, alongside explicit loading, error, and empty states.
-- The financial-analysis public backend layer has 26 passing tests covering context, controller behavior, CORS, service delegation, validation, and global error handling.
-- Broader coverage for the remaining operations, Spring Boot–Python integration tests, and complete frontend-to-model end-to-end validation remain planned for the final Hackathon phase.
-- No coverage percentage or completed end-to-end suite is claimed.
+- Automated backend unit and integration suites pass successfully, including 132 unit tests.
+- Integrated Spring Boot–Python tests and frontend-to-model end-to-end validation pass successfully.
+- Dockerized services on OCI Compute and saved ML artifacts in OCI Object Storage complete the Hackathon OCI requirement.
 
 ## Next Steps
 
-1. Implement the concrete `FinancialAnalysisGateway` and its internal DTOs, HTTP client, correlation, timeout, retry, and error mapping.
-2. Integrate Spring Boot with the Python service and validate the real financial-analysis flow.
-3. Implement and consolidate the public expense-simulation and transaction-classification operations.
-4. Progressively replace mocked responses with real service responses.
-5. Expand automated tests and perform integrated and end-to-end validation.
-6. Prepare OCI deployment and stabilize the final application.
-7. Produce the Demo Day presentation video.
+1. Present the completed MVP at Demo Day.
+2. Record and publish the final demonstration video.
+3. Evolve model loading with dynamic OCI Object Storage downloads at runtime.
+4. Add authenticated, persistent user history and continuous financial tracking.
+5. Extend observability, analytics, and post-MVP product capabilities.
 
 ## Team
 
@@ -224,6 +212,6 @@ The areas above describe the team's general contribution domains and do not impl
 
 ## Project Context
 
-RendaFlex is being developed for the **Programa ONE Hackathon**, part of **Oracle Next Education**, in collaboration with **Alura**. The project applies the program's software-development and data-learning tracks to a practical financial-inclusion challenge.
+RendaFlex was developed for the **Programa ONE Hackathon**, part of **Oracle Next Education**, in collaboration with **Alura**. The project applies the program's software-development and data-learning tracks to a practical financial-inclusion challenge.
 
-The functional frontend prototype is complete and publicly deployed, the version `2.0.0` MVP contract is final, and the financial-analysis public backend layer is ready. The concrete Spring Boot–Python gateway is the main integration dependency, while complete integrated validation, OCI deployment, final stabilization, and Demo Day preparation remain pending. The team expects final delivery in the penultimate week of August.
+The MVP is complete, integrated, and production-ready: the Vercel frontend consumes the Spring Boot API deployed in Docker on OCI Compute, which integrates with the Python/ML service on OCI Compute. The AI artifacts are packaged for autonomous service startup and supported by OCI Object Storage. The remaining roadmap focuses on Demo Day delivery and post-MVP evolution.
