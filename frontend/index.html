@@ -9,7 +9,7 @@
   <body>
     <script>
       (() => {
-        const savedTheme = localStorage.getItem('rendaflex.theme');
+        const savedTheme = localStorage.getItem('rendaflex-theme');
         const theme = savedTheme === 'light' || savedTheme === 'dark'
           ? savedTheme
           : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';

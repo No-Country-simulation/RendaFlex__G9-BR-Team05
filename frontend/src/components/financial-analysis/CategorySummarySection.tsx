@@ -1,5 +1,6 @@
 import { TransactionCategory, type CategorySummary } from '../../types'
 import { formatCurrency, transactionCategoryLabels } from '../../utils/financialAnalysisPresentation'
+import { transactionCategoryIcons } from '../../utils/transactionCategoryIcon'
 
 type CategorySummarySectionProps = {
   categorySummary: CategorySummary
@@ -21,7 +22,7 @@ export function CategorySummarySection({ categorySummary }: CategorySummarySecti
         <dl className="category-summary-grid">
           {categories.map(({ category, amount }) => (
             <div className="category-summary-item" key={category}>
-              <dt>{transactionCategoryLabels[category]}</dt>
+              <dt><span className="category-icon" aria-hidden="true">{(() => { const Icon = transactionCategoryIcons[category]; return <Icon size={18} strokeWidth={1.8} /> })()}</span>{transactionCategoryLabels[category]}</dt>
               <dd>{formatCurrency(amount)}</dd>
             </div>
           ))}

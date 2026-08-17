@@ -1,11 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { ThemeContext, type Theme } from './themeContextValue'
 
-const storageKey = 'rendaflex.theme'
+const storageKey = 'rendaflex-theme'
 
 function getInitialTheme(): Theme {
-  const documentTheme = document.documentElement.dataset.theme
-  if (documentTheme === 'light' || documentTheme === 'dark') return documentTheme
+  const savedTheme = localStorage.getItem(storageKey)
+  if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 

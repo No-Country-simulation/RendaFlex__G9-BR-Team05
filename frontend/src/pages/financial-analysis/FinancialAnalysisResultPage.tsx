@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { ArrowRight, RotateCcw, ShieldCheck, TrendingUp, Wallet, AlertTriangle } from 'lucide-react'
 import { ButtonLink } from '../../components/common/ButtonLink'
 import { CategorySummarySection } from '../../components/financial-analysis/CategorySummarySection'
 import { ClassifiedTransactionsSection } from '../../components/financial-analysis/ClassifiedTransactionsSection'
@@ -31,10 +32,10 @@ export function FinancialAnalysisResultPage() {
 
   const profile = financialProfileDetails[result.financialProfile]
   const metrics = [
-    { label: 'Renda média', value: formatCurrency(result.metrics.averageIncome) },
-    { label: 'Variação da renda', value: formatPercentage(result.metrics.incomeVariationCoefficientPercentage) },
-    { label: 'Nível de endividamento', value: formatPercentage(result.metrics.debtRatioPercentage) },
-    { label: 'Comprometimento fixo', value: formatPercentage(result.metrics.fixedCommitmentPercentage) },
+    { label: 'Renda média', value: formatCurrency(result.metrics.averageIncome), icon: Wallet },
+    { label: 'Variação da renda', value: formatPercentage(result.metrics.incomeVariationCoefficientPercentage), icon: TrendingUp },
+    { label: 'Nível de endividamento', value: formatPercentage(result.metrics.debtRatioPercentage), icon: AlertTriangle },
+    { label: 'Comprometimento fixo', value: formatPercentage(result.metrics.fixedCommitmentPercentage), icon: ShieldCheck },
   ]
 
   const startAgain = () => {
@@ -43,7 +44,7 @@ export function FinancialAnalysisResultPage() {
   }
 
   return (
-    <div className="result-page">
+    <div className="result-page fade-slide-up">
       <header className="page-heading">
         <span className="eyebrow">Resultado da análise</span>
         <h1>Seu perfil financeiro</h1>
@@ -64,6 +65,9 @@ export function FinancialAnalysisResultPage() {
         <div className="probability">
           <strong>{formatProbability(result.probability)}</strong>
           <span>probabilidade do perfil</span>
+          <div className={`probability-bar profile-${result.financialProfile.toLowerCase()}`} role="progressbar" aria-label="Probabilidade do perfil" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(result.probability * 100)}>
+            <span style={{ width: `${Math.round(result.probability * 100)}%` }} />
+          </div>
         </div>
       </section>
 
@@ -72,7 +76,7 @@ export function FinancialAnalysisResultPage() {
         <div className="metrics-grid">
           {metrics.map((metric) => (
             <article className="metric-card" key={metric.label}>
-              <span>{metric.label}</span>
+              <span><metric.icon className="metric-icon" size={18} strokeWidth={1.8} aria-hidden="true" />{metric.label}</span>
               <strong>{metric.value}</strong>
             </article>
           ))}
@@ -84,8 +88,8 @@ export function FinancialAnalysisResultPage() {
       <RecommendationsSection recommendations={result.recommendations} />
 
       <nav className="result-actions" aria-label="Ações do resultado">
-        <ButtonLink to="/expense-simulation">Simular nova despesa</ButtonLink>
-        <button className="button button-primary" type="button" onClick={startAgain}>Fazer nova análise</button>
+        <ButtonLink to="/expense-simulation" icon={<ArrowRight className="button-icon" size={17} aria-hidden="true" />}>Simular nova despesa</ButtonLink>
+        <button className="button button-primary" type="button" onClick={startAgain}><span className="button-content">Fazer nova análise<RotateCcw className="button-icon" size={17} aria-hidden="true" /></span></button>
         <ButtonLink to="/" variant="secondary">Voltar para o início</ButtonLink>
       </nav>
     </div>

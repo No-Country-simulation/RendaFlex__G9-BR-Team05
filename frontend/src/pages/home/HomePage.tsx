@@ -1,5 +1,6 @@
 import { ButtonLink } from '../../components/common/ButtonLink'
 import { Card } from '../../components/common/Card'
+import { ArrowRight } from 'lucide-react'
 
 export function HomePage() {
   return (
@@ -9,7 +10,7 @@ export function HomePage() {
           <span className="eyebrow">Sua renda muda. Seu planejamento pode acompanhar.</span>
           <h1 id="hero-title">Entenda melhor sua vida financeira, mês a mês.</h1>
           <p>O RendaFlex ajuda quem tem renda variável a organizar informações e tomar decisões com mais clareza e confiança.</p>
-          <div className="hero-actions"><ButtonLink to="/analysis">Começar minha análise</ButtonLink></div>
+          <div className="hero-actions"><ButtonLink to="/analysis" icon={<ArrowRight className="button-icon" size={17} aria-hidden="true" />}>Começar minha análise</ButtonLink></div>
         </div>
         <aside className="hero-note" aria-label="Proposta do RendaFlex">
           <strong>Feito para a sua realidade</strong>
@@ -23,7 +24,7 @@ export function HomePage() {
           <Card><h3>Perfil financeiro</h3><p>Entenda seu momento a partir do histórico da sua renda.</p></Card>
           <Card><h3>Despesas organizadas</h3><p>Visualize seus gastos por categorias de forma simples.</p></Card>
           <Card><h3>Recomendações</h3><p>Receba orientações práticas adequadas ao seu contexto.</p></Card>
-          <Card><h3>Simulação de despesas</h3><p>Depois da análise, compare o cenário atual e o impacto possível de uma nova despesa.</p><ButtonLink to="/expense-simulation" variant="secondary">Continuar para a simulação</ButtonLink></Card>
+          <Card><h3>Simulação de despesas</h3><p>Depois da análise, compare o cenário atual e o impacto possível de uma nova despesa.</p><ButtonLink to="/expense-simulation" variant="secondary" icon={<ArrowRight className="button-icon" size={17} aria-hidden="true" />}>Continuar para a simulação</ButtonLink></Card>
         </div>
       </section>
 

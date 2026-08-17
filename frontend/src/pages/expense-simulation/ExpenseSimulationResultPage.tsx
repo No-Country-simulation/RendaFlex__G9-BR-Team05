@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { RotateCcw } from 'lucide-react'
 import { ButtonLink } from '../../components/common/ButtonLink'
 import { RecommendationsSection } from '../../components/financial-analysis/RecommendationsSection'
 import { useExpenseSimulation } from '../../hooks/useExpenseSimulation'
@@ -28,7 +29,7 @@ export function ExpenseSimulationResultPage() {
       ? `O cenário passa de ${currentProfile.name} para ${projectedProfile.name}, sem indicação de piora da saúde financeira.`
       : 'A projeção mantém o perfil atual.'
   const startAgain = () => { clearResult(); navigate('/expense-simulation') }
-  return <div className="result-page">
+  return <div className="result-page fade-slide-up">
     <header className="page-heading"><span className="eyebrow">Resultado da simulação</span><h1>Comparação dos cenários</h1><p>Veja o possível impacto demonstrativo da despesa informada.</p></header>
     <aside className="demo-notice"><strong>Resultado de caráter informativo.</strong><p>Use a comparação dos cenários como apoio antes de assumir uma nova despesa.</p></aside>
     <section className="expense-summary" aria-labelledby="expense-summary-title"><div><span>Despesa simulada</span><h2 id="expense-summary-title">{result.simulatedExpense.description}</h2></div><dl><div><dt>Valor total</dt><dd>{formatCurrency(result.simulatedExpense.totalAmount)}</dd></div><div><dt>Parcelas</dt><dd>{result.simulatedExpense.installments}</dd></div><div><dt>Valor mensal</dt><dd>{formatCurrency(result.simulatedExpense.monthlyAmount)}</dd></div></dl></section>
@@ -37,6 +38,6 @@ export function ExpenseSimulationResultPage() {
     <section className="installment-highlight" aria-labelledby="installment-result-title"><span id="installment-result-title">Valor mensal da nova despesa</span><strong>{formatCurrency(result.monthlyInstallmentAmount)}</strong></section>
     <section className="result-section" aria-labelledby="comparison-title"><div className="result-section-heading"><h2 id="comparison-title">Indicadores atuais e projetados</h2><p>A diferença mostra a variação do cenário projetado.</p></div><div className="comparison-grid">{metrics(result.currentMetrics, result.projectedMetrics).map((metric) => { const difference = metric.projected - metric.current; const direction = difference > 0 ? 'Aumento' : difference < 0 ? 'Redução' : 'Estável'; return <article className="comparison-card" key={metric.label}><h3>{metric.label}</h3><dl><div><dt>Atual</dt><dd>{metric.format(metric.current)}</dd></div><div><dt>Projetado</dt><dd>{metric.format(metric.projected)}</dd></div><div><dt>Diferença</dt><dd>{direction}: {metric.format(Math.abs(difference))}</dd></div></dl></article> })}</div></section>
     <RecommendationsSection recommendations={result.recommendations} />
-    <nav className="result-actions" aria-label="Ações do resultado"><button className="button button-primary" type="button" onClick={startAgain}>Fazer nova simulação</button><ButtonLink to="/analysis/result" variant="secondary">Ver análise atual</ButtonLink><ButtonLink to="/" variant="secondary">Voltar para o início</ButtonLink></nav>
+    <nav className="result-actions" aria-label="Ações do resultado"><button className="button button-primary" type="button" onClick={startAgain}><span className="button-content">Fazer nova simulação<RotateCcw className="button-icon" size={17} aria-hidden="true" /></span></button><ButtonLink to="/analysis/result" variant="secondary">Ver análise atual</ButtonLink><ButtonLink to="/" variant="secondary">Voltar para o início</ButtonLink></nav>
   </div>
 }
